@@ -1,0 +1,398 @@
+---
+title: "Introduction to Torch Tensors"
+---
+
+# Torch Overview and Resources
+
+* Torch Website: https://torch.mlverse.org/
+* API Docs: https://torch.mlverse.org/docs/
+* [Deep Learning and Scientific Computing with R torch](https://skeydan.github.io/Deep-Learning-and-Scientific-Computing-with-R-torch/) by Sigrid Kyedana
+
+
+# Installation
+
+In order to use `torch`, you can install it from CRAN:
+
+```{r, eval = FALSE}
+install.packages("torch")
+```
+
+Afterwards, you have to run:
+
+```{r, eval = FALSE}
+torch::install_torch()
+```
+
+If both commands succeed, you are ready to go.
+
+You can check whether you have successfully installed cuda support (requires an NVIDIA GPU) by running:
+
+```{r}
+library(torch)
+cuda_is_available()
+```
+
+# Torch Tensors
+
+Tensors are the fundamental data structure in torch, serving as the backbone for both deep learning and scientific computing operations.
+While similar to R matrices, tensors offer enhanced capabilities that make them particularly suited for modern computational tasks.
+
+## Creating Tensors
+
+```{r}
+library(torch)
+
+# From R matrices
+x_matrix <- matrix(1:6, nrow = 2, ncol = 3)
+tensor_x <- torch_tensor(x_matrix)
+print(tensor_x)
+
+zeros_tensor <- torch_zeros(2, 3)      # Creates tensor of zeros
+ones_tensor <- torch_ones(2, 3)        # Creates tensor of ones
+like_tensor <- torch_zeros_like(ones_tensor)  # Creates zeros tensor with same shape as ones_tensor
+```
+
+
+### Random Sampling
+
+You can also randomly sample torch tensors:
+
+```{r}
+normal_tensor <- torch_randn(2, 3)    # Samples from N(0,1)
+uniform_tensor <- torch_rand(2, 3)     # Samples from U(0,1)
+```
+
+
+::: {.callout-warning}
+## Random Seeds in torch
+torch maintains its own random number generator, separate from R's.
+
+Setting R's random seed with `set.seed()` will not affect torch's random operations. Instead, use `torch_manual_seed()` to control reproducibility in torch operations.
+:::
+
+
+### Missing Values
+
+Torch tensors don't have a native representation for R's `NA` values. When converting R vectors containing `NA`s to torch tensors, you need to be careful:
+
+* *Double*: `NA_real_` becomes `NaN`
+  ```{r}
+  torch_tensor(NA_real_)
+  ```
+
+* *Integer*: `NA_integer_` becomes smallest negative value:
+  ```{r}
+  torch_tensor(NA_integer_)
+  ```
+
+* *Logical*: `NA` becomes `TRUE`:
+  ```{r}
+  torch_tensor(NA)
+  ```
+
+One should therefore handle missing values carefully before converting them to torch tensors.
+
+
+## Tensor Properties
+
+### Shape
+
+Like for R arrays, each tensor has a shape and a dimension:
+
+```{r}
+# Shape and dimensions
+print(tensor_x$shape)
+print(tensor_x$dim())
+```
+
+### Data Type
+
+Furthermore, each tensor has a dataype.
+as opposed to R, where one usually has one `integer` type and one `float` type, torch differentiates between different precisions:
+
+* *Floating point:*
+
+  ```{r}
+  # Float datatypes
+  float32_tensor <- torch_ones(2, 3, dtype = torch_float32())  # Default float
+  float64_tensor <- torch_ones(2, 3, dtype = torch_float64())  # Double precision
+  float16_tensor <- torch_ones(2, 3, dtype = torch_float16())  # Half precision
+  ```
+
+  Usually one works with 32-bit floats.
+
+* *Integer:*
+
+  ```{r}
+  # Integer datatypes
+  int32_tensor <- torch_ones(2, 3, dtype = torch_int32())
+  int64_tensor <- torch_ones(2, 3, dtype = torch_int64())  # Long
+  int16_tensor <- torch_ones(2, 3, dtype = torch_int16())  # Short
+  int8_tensor <- torch_ones(2, 3, dtype = torch_int8())    # Byte
+  uint8_tensor <- torch_ones(2, 3, dtype = torch_uint8())  # Unsigned byte
+  ```
+
+* *Boolean:*
+
+  ```{r}
+  # Boolean datatype
+  bool_tensor <- torch_ones(2, 3, dtype = torch_bool())
+  ```
+
+
+You can convert between datatypes using the `$to()` method:
+```{r}
+# Converting between datatypes
+x <- torch_ones(2, 3)  # Default float32
+x_int <- x$to(dtype = torch_int32())
+```
+
+
+### Device
+
+Each tensor lives on a "device", where common options are:
+
+* *cpu* for CPU, which is available everywhere
+* *cuda* for NVIDIA GPUs
+* *mps* for Apple Silicon (M1/M2/M3) GPUs on macOS
+
+```{r}
+# Create a tensor and move it to CUDA if available
+x <- torch_randn(2, 3)
+if (cuda_is_available()) { # Check if cuda is available
+  x <- x$to(device = torch_device("cuda"))
+  # x <- x$cuda() also works
+} else if (backends_mps_is_available()) {
+  x <- x$to(device = torch_device("mps"))
+} else {
+  print("CUDA not available, tensor remains on CPU")
+}
+
+print(x$device)
+
+x <- x$to(device = "cpu")
+# x <- x$cpu() also works
+print(x$device)
+```
+
+GPU acceleration enables massive parallelization of tensor operations, often providing 10-100x speedups compared to CPU processing for large-scale computations.
+
+::: {.callout-warning}
+## Device Compatibility
+Tensors must be on the same device to perform operations between them.
+:::
+
+## Converting Tensors Back to R
+
+You can easily convert torch tensors back to R using `as_array()`, `as.matrix()` or `$item()`:
+
+* 1-dimensional tensors are converted to R vectors:
+  ```{r}
+  as_array(torch_randn(3))
+  ```
+* `2`-dimensional tensors are converted to R matrices:
+
+  ```{r}
+  as.matrix(torch_randn(2, 2)) # as_array() also works
+  ````
+* `>2`-dimensional tensors are converted to R arrays:
+  ```{r}
+  as_array(torch_randn(2, 2, 2))
+  ```
+* `0`-dimensional tensors (scalars) are converted to R vectors with length 1:
+   ```{r}
+   torch_tensor_scalar(1)$item() # as_array() also works
+   ```
+
+
+## Basic Tensor Operations
+
+Torch provides two main syntaxes for tensor operations: function-style (`torch_*()`) and method-style (using `$`).
+
+Here's an example with matrix multiplication:
+
+```{r}
+# Create example tensors
+a <- torch_tensor(matrix(1:6, nrow=2, ncol=3))
+b <- torch_tensor(matrix(7:12, nrow=3, ncol=2))
+
+# Matrix multiplication - two equivalent ways
+c1 <- torch_matmul(a, b)  # Function style
+c2 <- a$matmul(b)         # Method style
+
+torch_equal(c1, c2)
+```
+
+Below, there is another example using addition:
+
+```{r}
+# Addition - two equivalent ways
+x <- torch_ones(2, 2)
+y <- torch_ones(2, 2)
+z1 <- torch_add(x, y)  # Function style
+z2 <- x$add(y)         # Method style
+```
+
+::: {.callout-tip}
+## In-place Operations
+Operations that modify the tensor directly are marked with an underscore suffix (`_`). These operations are more memory efficient as they don't create a new tensor:
+
+```{r}
+x <- torch_ones(2, 2)
+x$add_(1)  # Adds 1 to all elements in-place
+x
+```
+:::
+
+
+You can also apply common summary functions to torch tensors:
+
+```{r}
+x = torch_randn(1000)
+mean(x)
+max(x)
+sd(x)
+```
+
+
+
+## Broadcasting Rules
+
+Another difference between R arrays and torch tensors is how operations on tensors with different shapes are handled.
+For example, in R, we cannot add a matric with shape `(1, 2)` to a matrix with shape `(2, 3)`:
+
+
+```{r, error = TRUE}
+m1 = matrix(1:4, nrow = 2)
+m2 = matrix(1:2, nrow = 2)
+m1 + m2
+```
+
+Broadcasting (Similar to "recycling" in R) allows torch to perform operations between tensors of different shapes.
+
+```{r}
+t1 = torch_tensor(m1)
+t2 = torch_tensor(m2)
+t1 + t2
+```
+
+There are some strict rules the define when two shapes are compatible:
+
+1. If tensors have different ranks (number of dimensions), prepend 1's to the shape of the lower rank tensor until ranks match
+2. Two dimensions are compatible when:
+   * They are equal, or
+   * One of them is 1 (which will be stretched to match the other)
+3. If any dimension pair is incompatible, broadcasting fails
+
+::: {.callout-note}
+## Quiz: Broadcasting Rules
+
+Question 1: What would be the result shape when broadcasting a tensor of shape `(2, 1, 3)` with a tensor of shape `(4, 3)`?
+
+<details>
+<summary>Click for answer</summary>
+The result shape would be (2, 4, 3). Here's why:
+
+1. We prepend one to the rank of the second tensor to get `(1, 4, 3)`.
+2. Going dimension by dimension:
+   * First: 2 vs 1 -> Compatible, expands to 2
+   * Second: 1 vs 4 -> Compatible, expands to 4
+   * Third: 3 vs 3 -> Compatible, stays 3
+3. All pairs are compatible, so broadcasting succeeds
+</details>
+
+Question 2: Would broadcasting work between tensors of shape `(2, 3)` and `(3, 2)`?
+
+<details>
+<summary>Click for answer</summary>
+No, broadcasting would fail in this case. Here's why:
+
+1. Both tensors have the same rank (2), so no prepending needed
+2. Going dimension by dimension:
+   * First: 2 vs 3 -> Incompatible (neither is 1)
+   * Second: 3 vs 2 -> Incompatible (neither is 1)
+3. Since both dimension pairs are incompatible, broadcasting fails
+</details>
+:::
+
+
+## Reshaping Tensors
+
+## Reshaping Tensors
+
+Torch provides several ways to reshape tensors while preserving their data:
+
+```{r}
+# Create a sample tensor
+x <- torch_tensor(1:12)
+print(x)
+```
+
+We can reshape this tensor with shape `(12)` to a tensor with shape `(3, 4)`.
+
+```{r}
+x$reshape(c(3, 4))$shape
+```
+
+We can also infer dimensions by setting them to `-1`:
+
+```{r}
+x$reshape(c(-1, 3))$shape
+```
+
+Not all reshaping operations are valid, however.
+The number of elements of the original tensor and the reshaped tensor must be the same:
+
+```{r, error = TRUE}
+x$reshape(6)
+```
+
+## Reference Semantics
+
+One key property of torch tensors is that they have *references semantics*.
+This is different from R, where objects usually have *value semantics*.
+
+```{r}
+x <- torch_ones(2)
+y <- x
+y[1] <- 5
+x # was modified
+```
+
+This is different from R, where one usually has *value semantics*:
+
+```{r}
+x <- c(1, 1)
+y <- x
+y[1] <- 5
+x # was not modified
+```
+
+When one tensor (`y`) shares underlying data with another tensor (`x`) this is called a *view*:
+It is also possible to get a view on a subset of a tensor, e.g. via slicing:
+
+```{r}
+x = torch_arange(1, 10)
+y = x[1:3]
+y[1] = 100
+x[1]
+```
+
+Unfortunately, the same operation might sometimes create a view and other times allocate a new tensor.
+In the example below, we create a subset that is a non-contiguous sequence and hence a new tensor is allocated:
+
+```{r}
+x = torch_arange(1, 10)
+y = x[c(1, 3, 5)]
+y[1] = 100
+x[1]
+```
+
+If it is important to create a copy of a vector, you can call the `$clone()` method:
+
+```{r}
+x = torch_arange(1, 3)
+y = x$clone()
+y[1] = 10
+x[1] # is still 1
+```
