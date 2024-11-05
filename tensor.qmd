@@ -4,8 +4,8 @@ title: "Introduction to Torch Tensors"
 
 # Torch Overview and Resources
 
-* Torch Website: https://torch.mlverse.org/
-* API Docs: https://torch.mlverse.org/docs/
+* Torch Website: [https://torch.mlverse.org/](https://torch.mlverse.org/docs/)
+* API Docs: [https://torch.mlverse.org/docs/](https://torch.mlverse.org/docs/)
 * [Deep Learning and Scientific Computing with R torch](https://skeydan.github.io/Deep-Learning-and-Scientific-Computing-with-R-torch/) by Sigrid Kyedana
 
 
@@ -24,6 +24,7 @@ torch::install_torch()
 ```
 
 If both commands succeed, you are ready to go.
+Otherwise, you can consult [guide](https://torch.mlverse.org/docs/articles/installation) on how to install torch.
 
 You can check whether you have successfully installed cuda support (requires an NVIDIA GPU) by running:
 
@@ -35,13 +36,11 @@ cuda_is_available()
 # Torch Tensors
 
 Tensors are the fundamental data structure in torch, serving as the backbone for both deep learning and scientific computing operations.
-While similar to R matrices, tensors offer enhanced capabilities that make them particularly suited for modern computational tasks.
+While similar to R matrices, tensors offer enhanced capabilities that make them particularly suited for modern computational tasks: gpu acceleration and autograd.
 
 ## Creating Tensors
 
 ```{r}
-library(torch)
-
 # From R matrices
 x_matrix <- matrix(1:6, nrow = 2, ncol = 3)
 tensor_x <- torch_tensor(x_matrix)
@@ -59,7 +58,7 @@ You can also randomly sample torch tensors:
 
 ```{r}
 normal_tensor <- torch_randn(2, 3)    # Samples from N(0,1)
-uniform_tensor <- torch_rand(2, 3)     # Samples from U(0,1)
+uniform_tensor <- torch_rand(2, 3)    # Samples from U(0,1)
 ```
 
 
@@ -97,10 +96,9 @@ One should therefore handle missing values carefully before converting them to t
 
 ### Shape
 
-Like for R arrays, each tensor has a shape and a dimension:
+Like R arrays, each tensor has a shape and a dimension:
 
 ```{r}
-# Shape and dimensions
 print(tensor_x$shape)
 print(tensor_x$dim())
 ```
@@ -113,7 +111,6 @@ as opposed to R, where one usually has one `integer` type and one `float` type, 
 * *Floating point:*
 
   ```{r}
-  # Float datatypes
   float32_tensor <- torch_ones(2, 3, dtype = torch_float32())  # Default float
   float64_tensor <- torch_ones(2, 3, dtype = torch_float64())  # Double precision
   float16_tensor <- torch_ones(2, 3, dtype = torch_float16())  # Half precision
@@ -124,7 +121,6 @@ as opposed to R, where one usually has one `integer` type and one `float` type, 
 * *Integer:*
 
   ```{r}
-  # Integer datatypes
   int32_tensor <- torch_ones(2, 3, dtype = torch_int32())
   int64_tensor <- torch_ones(2, 3, dtype = torch_int64())  # Long
   int16_tensor <- torch_ones(2, 3, dtype = torch_int16())  # Short
@@ -135,7 +131,6 @@ as opposed to R, where one usually has one `integer` type and one `float` type, 
 * *Boolean:*
 
   ```{r}
-  # Boolean datatype
   bool_tensor <- torch_ones(2, 3, dtype = torch_bool())
   ```
 
@@ -162,8 +157,6 @@ x <- torch_randn(2, 3)
 if (cuda_is_available()) { # Check if cuda is available
   x <- x$to(device = torch_device("cuda"))
   # x <- x$cuda() also works
-} else if (backends_mps_is_available()) {
-  x <- x$to(device = torch_device("mps"))
 } else {
   print("CUDA not available, tensor remains on CPU")
 }
@@ -186,23 +179,19 @@ Tensors must be on the same device to perform operations between them.
 
 You can easily convert torch tensors back to R using `as_array()`, `as.matrix()` or `$item()`:
 
-* 1-dimensional tensors are converted to R vectors:
+* $0$-dimensional tensors (scalars) are converted to R vectors with length 1:
+  ```{r}
+  torch_scalar_tensor(1)$item() # as_array() also works
+  ```
+* $1$-dimensional tensors are converted to R vectors:
   ```{r}
   as_array(torch_randn(3))
   ```
-* `2`-dimensional tensors are converted to R matrices:
+* $>1$-dimensional tensors are converted to R arrays:
 
   ```{r}
-  as.matrix(torch_randn(2, 2)) # as_array() also works
-  ````
-* `>2`-dimensional tensors are converted to R arrays:
-  ```{r}
-  as_array(torch_randn(2, 2, 2))
+  as_array(torch_randn(2, 2))
   ```
-* `0`-dimensional tensors (scalars) are converted to R vectors with length 1:
-   ```{r}
-   torch_tensor_scalar(1)$item() # as_array() also works
-   ```
 
 
 ## Basic Tensor Operations
@@ -315,9 +304,6 @@ No, broadcasting would fail in this case. Here's why:
 </details>
 :::
 
-
-## Reshaping Tensors
-
 ## Reshaping Tensors
 
 Torch provides several ways to reshape tensors while preserving their data:
@@ -331,16 +317,30 @@ print(x)
 We can reshape this tensor with shape `(12)` to a tensor with shape `(3, 4)`.
 
 ```{r}
-x$reshape(c(3, 4))$shape
+y = x$reshape(c(3, 4))
+y
 ```
 
-We can also infer dimensions by setting them to `-1`:
+Internally, such reshaping information influence the *stride* of the tensor.
+
+```{r}
+x$stride()
+y$stride()
+```
+
+The value of the stride indicates how many elements to skip to get to the next element along each dimension:
+If we go from element `x[1]` (`1`) to element `x[2]` (`2`), we move one index along the columns of `y`.
+If we walk from `x[1]` to `x[5]` (`5`), i.e. 4 steps, we jump from row 1 to row 2.
+
+This means, e.g., that reshaping torch tensors can be considerably more efficient than transposing R arrays, as the latter will always allocate a new, reordered vector, while the former just changes the strides.
+
+Note than when reshaping tensors, can also infer dimensions by setting them to `-1`:
 
 ```{r}
 x$reshape(c(-1, 3))$shape
 ```
 
-Not all reshaping operations are valid, however.
+Of course, not all reshaping operations are valid.
 The number of elements of the original tensor and the reshaped tensor must be the same:
 
 ```{r, error = TRUE}
@@ -396,3 +396,8 @@ y = x$clone()
 y[1] = 10
 x[1] # is still 1
 ```
+
+::: {.callout-warning}
+This is also the case for the `$reshape()` methods from the last section, which will in some cases create a view and in other cases allocate a new tensor with the desired shape.
+If you want to ensure that you create a view on a tensor, you can use the `$view()` method.
+:::

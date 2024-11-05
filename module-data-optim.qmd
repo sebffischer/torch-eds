@@ -345,7 +345,7 @@ Available optimizers include:
 
 ```{r}
 # Create optimizer
-optimizer <- optim_sgd(model$parameters, lr = 0.2)
+optimizer <- optim_adam(model$parameters, lr = 0.2)
 ```
 
 We will see the optimizer in action in the next section!
@@ -355,16 +355,10 @@ We will see the optimizer in action in the next section!
 Now we can put everything together:
 
 ```{r}
+debug(optimizer$step)
 # Training settings
-n_epochs <- 200
-device <- "cpu"
- if (cuda_is_available()) {
-  "cuda"
-} else if (backends_mps_is_available()) {
-  "mps"
-} else {
-  "cpu"
-}
+n_epochs <- 2
+device <- "mps"
 
 # Move model to device
 model$to(device = device)
@@ -391,7 +385,12 @@ for(epoch in seq_len(n_epochs)) {
     # Backward pass
     optimizer$zero_grad()
     loss$backward()
+
+    browser()
+    print(model$parameters[[1]]$grad)
+    param = as_array(model$parameters[[1]])
     optimizer$step()
+    print(mean(abs(param - as_array(model$parameters[[1]]))))
 
     # Store training losses
     train_losses <- c(train_losses, loss$item())

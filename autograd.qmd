@@ -17,15 +17,17 @@ Autograd works by building a dynamic computational graph of operations, where ea
 
 ## Enabling Gradient Tracking
 
-To use autograd, tensors must be created with `requires_grad = TRUE`.
+To use autograd, tensors must their `requires_grad` be `TRUE`.
+This can either be set during construction, but also changed afterwards using the in-place modifier `$requires_grad_(TRUE)`.
 In the context of deep learning, we track the gradients of the weights of a neural network.
-The simplest case is a simple linear model, where we have slope $a$ and bias $b$ and a single input $x$.
+The simpleste "neural network" is a linear model where we have slope $a$ and bias $b$ and a single input $x$.
 
 The forward pass is defined as:
 $\hat{y} = a \times x + b$
 
-We could e.g. be interested in how the prediction $\hat{y}$ changes for the given $x$ when we change the weight $a$ or the bias $b$.
-Let $u = a \times x$ denote the temporary tensor
+We could be interested in how the prediction $\hat{y}$ changes for the given $x$ when we change the weight $a$ or the bias $b$.
+We will later use this to change the weights $a$ and $b$ to lead to better predictions.
+To write down the gradients, let $u = a \times x$ denote the temporary tensor from the linear relationship.
 
 * Weight *a*:
   This is expressed by the gradient $\frac{\partial \hat{y}}{\partial a}$.
@@ -111,8 +113,6 @@ y$backward()
 print(a$grad)  # dy/da = x = 3
 print(b$grad)  # dy/db = 1
 ```
-
-$\frac{\partial y}{\partial a}$
 
 
 In the next section we will show how we can use gradients to train a simple linear model.
@@ -221,6 +221,7 @@ Gradient descent uses this property to iteratively:
 
 Note that the gradient only tells us in which direction we have to go, not too far.
 The length of the step should not be:
+
 - **too large** because the gradient approximation only holds in a small neighbourhood
 - **too small** as otherwise the convergence will be slow.
 
@@ -238,7 +239,8 @@ In practice, when dealing with large datasets, computing the gradient over the e
 3. Update the parameters using this approximate gradient
 
 While the gradients from SGD are noisier than full gradient descent, they:
-- Require less computation per update
+
+- Require less compute and memory per update
 - Implicitly regularize the optimization
 - Can help escape local minima due to the noise
 - Often converge faster in practice
@@ -280,6 +282,7 @@ library(data.table)
 lr <- 0.02
 epochs <- 10
 batch_size <- 10
+
 # Split data into 10 batches of size 10
 batches <- split(sample(1:100), rep(seq_len(batch_size), length.out = 100))
 history <- list()
@@ -293,7 +296,7 @@ for (epoch in seq_len(epochs)) {
 history = rbindlist(history)
 ```
 
-```{r}
+```{r, include = FALSE}
 # plot results with lines showing progression
 plot_steps <- seq(1, epochs * length(batches), length.out = epochs)
 for (i in plot_steps) {
@@ -314,7 +317,7 @@ The Blue line is the true relationship.
 
 We can also visualize the parameter udpates over time:
 
-```{r}
+```{r, include = FALSE}
 # Plot parameter updates on the contour plot
 ggplot(data = grid, aes(x = a, y = b, z = mse)) +
   geom_contour_filled() +
