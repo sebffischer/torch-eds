@@ -2,11 +2,17 @@
 title: "Introduction to Torch Tensors"
 ---
 
+```{r, include = FALSE}
+set.seed(123)
+torch::torch_manual_seed(123)
+```
+
 # Torch Overview and Resources
 
 * Torch Website: [https://torch.mlverse.org/](https://torch.mlverse.org/docs/)
 * API Docs: [https://torch.mlverse.org/docs/](https://torch.mlverse.org/docs/)
-* [Deep Learning and Scientific Computing with R torch](https://skeydan.github.io/Deep-Learning-and-Scientific-Computing-with-R-torch/) by Sigrid Kyedana
+* Book by Sigrid Kyedana: [Deep Learning and Scientific Computing with R torch](https://skeydan.github.io/Deep-Learning-and-Scientific-Computing-with-R-torch/)
+* As `torch` for R follows `PyTorch` quite closely, you can also consult docs for the latter
 
 
 # Installation
@@ -24,8 +30,7 @@ torch::install_torch()
 ```
 
 If both commands succeed, you are ready to go.
-Otherwise, you can consult [guide](https://torch.mlverse.org/docs/articles/installation) on how to install torch.
-
+Otherwise, you can consult [this guide](https://torch.mlverse.org/docs/articles/installation) on how to install torch.
 You can check whether you have successfully installed cuda support (requires an NVIDIA GPU) by running:
 
 ```{r}
@@ -36,7 +41,7 @@ cuda_is_available()
 # Torch Tensors
 
 Tensors are the fundamental data structure in torch, serving as the backbone for both deep learning and scientific computing operations.
-While similar to R matrices, tensors offer enhanced capabilities that make them particularly suited for modern computational tasks: gpu acceleration and autograd.
+While similar to R matrices, tensors offer enhanced capabilities that make them particularly suited for modern computational tasks, namely *gpu acceleration* and *automatic differentation (autograd)*.
 
 ## Creating Tensors
 
@@ -100,13 +105,13 @@ Like R arrays, each tensor has a shape and a dimension:
 
 ```{r}
 print(tensor_x$shape)
-print(tensor_x$dim())
+print(tensor_x$dim()) # dim(tensor_x) also works
 ```
 
 ### Data Type
 
 Furthermore, each tensor has a dataype.
-as opposed to R, where one usually has one `integer` type and one `float` type, torch differentiates between different precisions:
+As opposed to base R, where one usually has one `integer` type (32 bits) and one floating point type (`double`, 64 bits), torch differentiates between different precisions:
 
 * *Floating point:*
 
@@ -140,6 +145,14 @@ You can convert between datatypes using the `$to()` method:
 # Converting between datatypes
 x <- torch_ones(2, 3)  # Default float32
 x_int <- x$to(dtype = torch_int32())
+```
+
+Note that floats are converted to integer by truncating and not by rounding.
+
+
+```{r}
+torch_tensor(2.999)$to(dtype = torch_int())
+torch_tensor(-2.999)$to(dtype = torch_int())
 ```
 
 
@@ -310,18 +323,35 @@ Torch provides several ways to reshape tensors while preserving their data:
 
 ```{r}
 # Create a sample tensor
-x <- torch_tensor(1:12)
+x <- torch_tensor(0:15)
 print(x)
 ```
 
-We can reshape this tensor with shape `(12)` to a tensor with shape `(3, 4)`.
+We can reshape this tensor with shape `(16)` to a tensor with shape `(4, 4)`.
 
 ```{r}
-y = x$reshape(c(3, 4))
+y = x$reshape(c(4, 4))
 y
 ```
 
-Internally, such reshaping information influence the *stride* of the tensor.
+When `x` is reshaped to `y`, we can *imagine it* as initializing a new tensor of the desired shape and then filling up the rows and columns of the new tensor by iterating over the the rows and columns of the old tensor:
+
+```{r}
+y2 = torch_zeros(4, 4)
+for (j in 1:4) { # columns
+  for (i in 1:4) { # rows
+    y2[i, j] = y[i, j]
+  }
+}
+sum(abs(y - y2))
+```
+
+
+::: {.callout-important}
+Torch tensors are in **row-major** format and it is important to remember this order, i.e. iterate first fill up rows, then columns etc. when reshaping.
+:::
+
+Internally, this type of reshaping is (in many cases) implemented by changing the *stride* of the tensor, without changing the underlying data.
 
 ```{r}
 x$stride()
@@ -330,14 +360,36 @@ y$stride()
 
 The value of the stride indicates how many elements to skip to get to the next element along each dimension:
 If we go from element `x[1]` (`1`) to element `x[2]` (`2`), we move one index along the columns of `y`.
-If we walk from `x[1]` to `x[5]` (`5`), i.e. 4 steps, we jump from row 1 to row 2.
+If we walk from `x[1]` to `x[5]` (`5`), i.e. 4 steps, we move one index along the rows of `y`.
 
 This means, e.g., that reshaping torch tensors can be considerably more efficient than transposing R arrays, as the latter will always allocate a new, reordered vector, while the former just changes the strides.
 
-Note than when reshaping tensors, can also infer dimensions by setting them to `-1`:
+The functionality of strides is visualized in the image below.
+
+TODO: Include image
+![2D Tensor Strides](assets/2D_tensor_strides.png){fig-align="center" width=100%}
+Source: [How to Represent a Tensor or ndarray](https://martinlwx.github.io/en/how-to-reprensent-a-tensor-or-ndarray/)
+
+::: {.callout-note}
+## Quiz: Strides
+
+Question 1: How do you need to change the strides from a matrix with strides `(4, 1)` to transpose it?
+
+<details>
+<summary>Click for answer</summary>
+The matrix can be transposed by changing the strides from `(4, 1)` to `(1, 4)`.
+```{r}
+y$t()$stride()
+```
+
+</details>
+</details>
+:::
+
+When reshaping tensors, one can also infer a dimension by setting it to `-1`:
 
 ```{r}
-x$reshape(c(-1, 3))$shape
+x$reshape(c(-1, 4))$shape
 ```
 
 Of course, not all reshaping operations are valid.
@@ -378,7 +430,7 @@ y[1] = 100
 x[1]
 ```
 
-Unfortunately, the same operation might sometimes create a view and other times allocate a new tensor.
+Unfortunately, the similar operations might sometimes create a view and other times allocate a new tensor.
 In the example below, we create a subset that is a non-contiguous sequence and hence a new tensor is allocated:
 
 ```{r}
@@ -399,5 +451,29 @@ x[1] # is still 1
 
 ::: {.callout-warning}
 This is also the case for the `$reshape()` methods from the last section, which will in some cases create a view and in other cases allocate a new tensor with the desired shape.
-If you want to ensure that you create a view on a tensor, you can use the `$view()` method.
+If you want to ensure that you create a view on a tensor, you can use the `$view()` method, which will fail if the required view is not possible.
 :::
+
+::: {.callout-note}
+## Quiz: Contiguous Data
+
+Question 1: Reshaping a 2D Tensor
+
+Consider the tensor below:
+```{r}
+x1 = torch_tensor(matrix(1:6, nrow = 2, byrow = FALSE))
+x1
+```
+
+What is the result of `x1$reshape(6)`, i.e. what is the first, second, ... sixth element?
+
+<details>
+<summary>Click for answer</summary>
+This will result in `(1, 3, 5, 2, 4, 6)` because we (imagine that) we first iterate over the rows and then the columns when "creating" the new tensor.
+</details>
+</details>
+:::
+
+
+
+## Exercises

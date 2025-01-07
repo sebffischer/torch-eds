@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.450">
+<meta name="generator" content="quarto-1.6.39">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -22,7 +22,7 @@ ul.task-list li input[type="checkbox"] {
 }
 /* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -33,7 +33,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -57,22 +57,49 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="autograd_files/libs/clipboard/clipboard.min.js"></script>
-<script src="autograd_files/libs/quarto-html/quarto.js"></script>
-<script src="autograd_files/libs/quarto-html/popper.min.js"></script>
-<script src="autograd_files/libs/quarto-html/tippy.umd.min.js"></script>
-<script src="autograd_files/libs/quarto-html/anchor.min.js"></script>
-<link href="autograd_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="autograd_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="autograd_files/libs/bootstrap/bootstrap.min.js"></script>
-<link href="autograd_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="autograd_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
-<script src="autograd_files/libs/quarto-diagram/mermaid.min.js"></script>
-<script src="autograd_files/libs/quarto-diagram/mermaid-init.js"></script>
-<link href="autograd_files/libs/quarto-diagram/mermaid.css" rel="stylesheet">
+<script src="2-autograd_files/libs/clipboard/clipboard.min.js"></script>
+<script src="2-autograd_files/libs/quarto-html/quarto.js"></script>
+<script src="2-autograd_files/libs/quarto-html/popper.min.js"></script>
+<script src="2-autograd_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="2-autograd_files/libs/quarto-html/anchor.min.js"></script>
+<link href="2-autograd_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="2-autograd_files/libs/quarto-html/quarto-syntax-highlighting-e26003cea8cd680ca0c55a263523d882.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="2-autograd_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="2-autograd_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="2-autograd_files/libs/bootstrap/bootstrap-973236bd072d72a04ee9cd82dcc9cb29.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="2-autograd_files/libs/quarto-diagram/mermaid.min.js"></script>
+<script src="2-autograd_files/libs/quarto-diagram/mermaid-init.js"></script>
+<link href="2-autograd_files/libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -97,20 +124,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </div>
   
 
+
 </header>
+
 
 <p>TODO: * is <code>with_no_grad</code> covered enough?</p>
 <section id="overview" class="level1">
 <h1>Overview</h1>
 <p>Automatic differentiation (autograd) is one of torch’s key features, enabling automatic computation of gradients for optimization tasks like training neural networks. Unlike numerical differentiation which approximates gradients using finite differences, autograd computes exact gradients by tracking operations as they are performed and automatically applying the chain rule of calculus. This makes it possible to efficiently compute gradients of complex functions with respect to many parameters - a critical requirement for training modern neural networks. Autograd works by building a dynamic computational graph of operations, where each node represents a tensor and each edge represents a mathematical operation.</p>
-</section>
-<section id="basic-concepts" class="level1">
-<h1>Basic Concepts</h1>
+<p><strong>Why do we need automatic differentation?</strong></p>
+<p>In deep learning, training a model requires iteratively updating parameters to minimize a loss function, which measures the difference between predictions and actual data. These updates depend on calculating gradients of the loss with respect to model parameters, information used by optimization algorithms like stochastic gradient descent (SGD). <em>Automatic Differentiation</em> obviates the need to manually derive these gradients, which is error-prone.</p>
 <section id="enabling-gradient-tracking" class="level2">
 <h2 class="anchored" data-anchor-id="enabling-gradient-tracking">Enabling Gradient Tracking</h2>
-<p>To use autograd, tensors must their <code>requires_grad</code> be <code>TRUE</code>. This can either be set during construction, but also changed afterwards using the in-place modifier <code>$requires_grad_(TRUE)</code>. In the context of deep learning, we track the gradients of the weights of a neural network. The simpleste “neural network” is a linear model where we have slope <span class="math inline">\(a\)</span> and bias <span class="math inline">\(b\)</span> and a single input <span class="math inline">\(x\)</span>.</p>
+<p>To use autograd, tensors must have their <code>requires_grad</code> field be <code>TRUE</code>. This can either be set during construction, but also changed afterwards using the in-place modifier <code>$requires_grad_(TRUE)</code>. In the context of deep learning, we track the gradients of the weights of a neural network. The simpleste “neural network” is a linear model where we have slope <span class="math inline">\(a\)</span> and bias <span class="math inline">\(b\)</span> and a single input <span class="math inline">\(x\)</span>.</p>
 <p>The forward pass is defined as: <span class="math inline">\(\hat{y} = a \times x + b\)</span></p>
-<p>We could be interested in how the prediction <span class="math inline">\(\hat{y}\)</span> changes for the given <span class="math inline">\(x\)</span> when we change the weight <span class="math inline">\(a\)</span> or the bias <span class="math inline">\(b\)</span>. We will later use this to change the weights <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> to lead to better predictions. To write down the gradients, let <span class="math inline">\(u = a \times x\)</span> denote the temporary tensor from the linear predictor.</p>
+<p>We could be interested in how the prediction <span class="math inline">\(\hat{y}\)</span> changes for the given <span class="math inline">\(x\)</span> when we change the weight <span class="math inline">\(a\)</span> or the bias <span class="math inline">\(b\)</span>. We will later use this to change the weights <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> to lead to better predictions, i.e.&nbsp;we will perform gradient-based optimization. To write down the gradients, let <span class="math inline">\(u = a \times x\)</span> denote the temporary tensor from the linear predictor.</p>
 <ul>
 <li>Weight <em>a</em>: This is expressed by the gradient <span class="math inline">\(\frac{\partial \hat{y}}{\partial a}\)</span>. We can write down the derivative <span class="math inline">\(\frac{\partial \hat{y}}{\partial a}\)</span> using the chain rule as <span class="math inline">\(\frac{\partial \hat{y}}{\partial a} = \frac{\partial \hat{y}}{\partial u} \cdot \frac{\partial u}{\partial a} = 1 \cdot x = x\)</span>.</li>
 <li>Bias <em>b</em>: <span class="math inline">\(\frac{\partial \hat{y}}{\partial b} = 1\)</span></li>
@@ -131,16 +159,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>u <span class="ot">=</span> a <span class="sc">*</span> x</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">=</span> u <span class="sc">+</span> b</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>When you perform operations on tensors with gradient tracking, torch builds a dynamic computational graph. In the figure below:</p>
+<p>When you perform operations on tensors with gradient tracking, builds a computational graph on the fly. In the figure below:</p>
 <ul>
 <li>blue tensors are those for which we want to calculate gradients</li>
 <li>the violet node is an intermediate tensor</li>
 <li>the yellow boxes are differentiable functions</li>
 <li>the green node is the final tensor w.r.t. which we want to calculate gradients.</li>
 </ul>
-<div class="cell">
+<div class="cell" data-layout-align="default">
 <div class="cell-output-display">
 <div>
+<p></p><figure class="figure"><p></p>
 <div>
 <pre class="mermaid mermaid-js">graph TD
     a[a] --&gt; mul[Multiply]
@@ -153,25 +182,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     %% Gradient flow
     y_grad[dy/du = 1, dy/db = 1] -.-&gt; y
     u_grad[du/da = x] -.-&gt; u
-    a_grad[dy/da = dy/du * du/dx = 1 * x] -.-&gt; a
+    a_grad[dy/da = x] -.-&gt; a
     b_grad[dy/db = 1] -.-&gt; b
 
     %% Styling
-    classDef input fill:#a8d5ff,stroke:#333;
-    classDef op fill:#ffe5a8,stroke:#333;
-    classDef output fill:#a8ffb6,stroke:#333;
-    classDef grad fill:#ffa8a8,stroke:#333,stroke-dasharray: 5 5;
-    classDef intermediate fill:#d5a8ff,stroke:#333;
-    classDef nograd fill:#e8e8e8,stroke:#333;  %% New class for x
+    classDef input fill:#a8d5ff,stroke:#333
+    classDef op fill:#ffe5a8,stroke:#333
+    classDef output fill:#a8ffb6,stroke:#333
+    classDef grad fill:#ffa8a8,stroke:#333,stroke-dasharray:5,5
+    classDef intermediate fill:#d5a8ff,stroke:#333
+    classDef nograd fill:#e8e8e8,stroke:#333
 
-    class a,b input;
-    class mul,add op;
-    class y output;
-    class u intermediate;
-    class y_grad,add_grad,u_grad,a_grad,b_grad grad;
-    class x nograd;  %% Apply new class to x
+    class a,b input
+    class mul,add op
+    class y output
+    class u intermediate
+    class y_grad,u_grad,a_grad,b_grad grad
+    class x nograd
 </pre>
 </div>
+<p></p></figure><p></p>
 </div>
 </div>
 </div>
@@ -186,7 +216,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>MulBackward0</code></pre>
 </div>
 </div>
-<p>In order to calculate the gradients <span class="math inline">\(\frac{\partial y}{\partial a}\)</span> and <span class="math inline">\(\frac{\partial y}{\partial b}\)</span> we can simply call these derivative functions, traverse the graphs and multiply the individual derivatives according to the chain rule. In <code>torch</code> this is done by calling <code>$backward()</code> on <code>y</code>: we simply call <code>$backward()</code> on <code>y</code>. The gradients are then accessible in the <code>$grad</code> field of the tensors <code>a</code> and <code>b</code>:</p>
+<p>In order to calculate the gradients <span class="math inline">\(\frac{\partial y}{\partial a}\)</span> and <span class="math inline">\(\frac{\partial y}{\partial b}\)</span> we can traverse this computational graph backwards, call the derivatinge functions and multiply the individual derivatives according to the chain rule. In <code>torch</code> this is done by calling <code>$backward()</code> on <code>y</code>: The gradients are then accessible in the <code>$grad</code> field of the tensors <code>a</code> and <code>b</code>:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute gradients</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>y<span class="sc">$</span><span class="fu">backward</span>()</span>
@@ -203,6 +233,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>torch_tensor
  1
 [ CPUFloatType{1} ]</code></pre>
+</div>
+</div>
+<p>Note that only those tensors for which we set <code>$requires_grad</code> to <code>TRUE</code> store the tensors. For the intermediate value <code>u</code>, no gradient is stored.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>When you want to perform an operation on tensors that require gradients without tracking this specific operation, you can use <code>with_no_grad(...)</code>.</p>
 </div>
 </div>
 <p>In the next section we will show how we can use gradients to train a simple linear model.</p>
@@ -228,7 +272,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="cell">
 <div class="cell-output-display">
-<p><img src="autograd_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2-autograd_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>First, we randomly initialize our parameters <code>a</code> and <code>b</code>.</p>
@@ -237,10 +285,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="fu">torch_randn</span>(<span class="dv">1</span>, <span class="at">requires_grad =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="fu">torch_randn</span>(<span class="dv">1</span>, <span class="at">requires_grad =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>We can also visualize the loss landscape with respect to <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span>:</p>
+<p>In order to optimize the parameters <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span>, we need to define the <em>Loss Function</em> that quantifies the discrepancy between our predictions <span class="math inline">\(\hat{y}\)</span> and the observed values <span class="math inline">\(y\)</span>. The standard loss for linear regression is the L2 loss: <span class="math display">\[ L(y, \hat{y}) = (y - \hat{y})^2\]</span></p>
+<p>The graphic below visualizes the relationship between the parameters <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> with the average L2 loss over all datapoints, i.e., the Mean Square Error (MSE). For parameters <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> that are on the same contour line, the same loss is observed. The color gradient indicates the magnitude of the MSE. In this case, ligher values mark areas with higher loss and darker values mark areas with lower loss. The red point marks the minimum loss, while the blue point shows the starting values of the parameters.</p>
 <div class="cell">
 <div class="cell-output-display">
-<p><img src="autograd_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2-autograd_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>We can optimize the parameters <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> to converge to the minimum by using <strong>gradient descent</strong>. Gradient descent is a fundamental optimization algorithm that helps us find the minimum of a function by iteratively moving in the direction of steepest descent.</p>
@@ -253,13 +306,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Take a small step in the opposite direction of the gradient</li>
 <li>Repeat until we reach a minimum</li>
 </ol>
-<p>Note that the gradient only tells us in which direction we have to go, not too far. The length of the step should not be:</p>
+<p>Note that the gradient only tells us in which direction we have to go, not how far. The length of the step should not be:</p>
 <ul>
 <li><strong>too large</strong> because the gradient approximation only holds in a small neighbourhood</li>
 <li><strong>too small</strong> as otherwise the convergence will be slow.</li>
 </ul>
 <p>The general update formula for the weights <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> is:</p>
-<p><span class="math inline">\(a_{t+1} = a_t - \eta \frac{\partial L}{\partial a_t}\)</span> <span class="math inline">\(b_{t+1} = b_t - \eta \frac{\partial L}{\partial b_t}\)</span></p>
+<p><span class="math display">\[a_{t+1} = a_t - \eta \frac{\partial L}{\partial a_t}\]</span> <span class="math display">\[b_{t+1} = b_t - \eta \frac{\partial L}{\partial b_t}\]</span></p>
 <p>where <span class="math inline">\(\eta\)</span> is the learning rate and <span class="math inline">\(L\)</span> is the loss function.</p>
 <p>In practice, when dealing with large datasets, computing the gradient over the entire dataset can be computationally expensive. Instead, we often use <strong>Stochastic Gradient Descent (SGD)</strong>, where we:</p>
 <ol type="1">
@@ -270,7 +323,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>While the gradients from SGD are noisier than full gradient descent, they:</p>
 <ul>
 <li>Require less compute and memory per update</li>
-<li>Implicitly regularize the optimization</li>
+<li>Implicitly regularize the optimization, which improves generalization</li>
 <li>Can help escape local minima due to the noise</li>
 <li>Often converge faster in practice</li>
 </ul>
@@ -318,8 +371,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>history <span class="ot">=</span> <span class="fu">rbindlist</span>(history)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>This example demonstrates how we can use torch’s autograd to implement gradient descent for fitting a simple linear regression model. The dashed red lines show the progression of the model during training, with increasing opacity for later steps. The Blue line is the true relationship.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2-autograd_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 <p>We can also visualize the parameter udpates over time:</p>
-<p>Of course, there exist better solutions for estimating a simple linear model, but the example demonstrated how we can make use of an autograd system to estimate the parameters of a model.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="2-autograd_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Of course, better solutions exist for estimating a simple linear model, but the example demonstrated how we can make use of an autograd system to estimate the parameters of a model.</p>
+</section>
+<section id="exercises" class="level2">
+<h2 class="anchored" data-anchor-id="exercises">Exercises:</h2>
+<ol type="1">
+<li>Extend the approach in the notebook to multivariate regression.</li>
+</ol>
 </section>
 </section>
 
@@ -360,18 +437,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
     return false;
   }
-  const clipboard = new window.ClipboardJS('.code-copy-button', {
-    text: function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-  });
-  clipboard.on('success', function(e) {
+  const onCopySuccess = function(e) {
     // button target
     const button = e.trigger;
     // don't keep focus
@@ -403,11 +469,48 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }, 1000);
     // clear code selection
     e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
   });
-  function tippyHover(el, contentFn) {
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
-      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -417,8 +520,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start'
+      placement: 'bottom-start',
     };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -430,7 +542,129 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
-      return note.innerHTML;
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
     });
   }
       let selectedAnnoteEl;
@@ -474,6 +708,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             }
             div.style.top = top - 2 + "px";
             div.style.height = height + 4 + "px";
+            div.style.left = 0;
             let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
             if (gutterDiv === null) {
               gutterDiv = window.document.createElement("div");
@@ -499,6 +734,32 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         });
         selectedAnnoteEl = undefined;
       };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
       // Attach click handler to the DT
       const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
       for (const annoteDlNode of annoteDls) {
@@ -559,6 +820,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 });
 </script>
 </div> <!-- /content -->
+
 
 
 

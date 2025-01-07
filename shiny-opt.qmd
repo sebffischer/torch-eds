@@ -1,0 +1,64 @@
+---
+title: "AdamW Optimization"
+format:
+  html:
+    page-layout: custom
+server: shiny
+---
+
+```{r}
+#| panel: sidebar
+numericInput('learning_rate', 'Learning Rate', value = 0.01, min = 0.0001, max = 1, step = 0.001)
+numericInput('weight_decay', 'weight decay', value = 0.01, min = 0, max = 1, step = 0.001)
+numericInput('betas_1', 'beta 1', value = 0.9, step = 0.01)
+numericInput('betas_2', 'beta 2', value = 0.999, step = 0.001)
+numericInput('batch_size', 'batch size', value = 64, min = 1, max = 1000, step = 1)
+numericInput('epochs', 'epochs', value = 10, min = 1, max = 100, step = 1)
+actionButton('run_opt', 'Run AdamW Optimization')
+```
+
+```{r}
+#| panel: fill
+plotOutput('adamwPlot')
+```
+
+```{r}
+#| context: server
+library(shiny)
+library(ggplot2)
+source('helper.R')  # Ensure helper.R is in the working directory
+
+# Placeholder for run_adamwe function
+# Define or source your run_adamwe function appropriately
+run_adamwe <- function(learning_rate, weight_decay, iterations, initial_w, initial_b) {
+  # Example implementation (replace with actual AdamW optimizer)
+  trajectory <- data.frame(w = numeric(iterations + 1), b = numeric(iterations + 1))
+  trajectory$w[1] <- initial_w
+  trajectory$b[1] <- initial_b
+  for(i in 1:iterations) {
+    # Dummy update rules (replace with actual AdamW logic)
+    trajectory$w[i + 1] <- trajectory$w[i] - learning_rate * (trajectory$w[i] + weight_decay * trajectory$w[i])
+    trajectory$b[i + 1] <- trajectory$b[i] - learning_rate * (trajectory$b[i] + weight_decay * trajectory$b[i])
+  }
+  grid <- expand.grid(a = seq(min(trajectory$w) - 1, max(trajectory$w) + 1, length.out = 100),
+                      b = seq(min(trajectory$b) - 1, max(trajectory$b) + 1, length.out = 100))
+  grid$mse <- with(grid, (a - 2)^2 + (b - 3)^2)  # Example loss surface
+  list(trajectory = trajectory, grid = grid)
+}
+
+selectedData <- eventReactive(input$run_opt, {
+  run_adamwe(
+    learning_rate = input$learning_rate,
+    weight_decay = input$weight_decay,
+    iterations = input$iterations,
+    initial_w = input$initial_w,
+    initial_b = input$initial_b
+  )
+})
+
+output$adamwPlot <- renderPlot({
+  adamw_output <- selectedData()
+  req(adamw_output)
+  plot_adamw_trajectory(adamw_output)
+})
+```

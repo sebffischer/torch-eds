@@ -1,0 +1,277 @@
+---
+title: "Training Neural Networks with mlr3torch"
+---
+
+```{r, include = FALSE}
+lgr::get_logger("mlr3")$set_threshold("warn")
+set.seed(123)
+torch::torch_manual_seed(123)
+```
+
+## Why Use `mlr3torch`?
+
+`mlr3torch` is a package that extends the `mlr3` framework with deep learning capabilities and allows to apply deep learning techniques to both tabular and non-tabular data.
+The package implements many routines common in deep learing and allows to focus on the actual problem at hand.
+Some advantages of using `mlr3torch` over 'only' `torch` are:
+
+- **Less Code**: Avoid writing repetitive boilerplate code by utilizing predefined network architectures or easily building custom ones tailored to your specific needs.
+
+- **mlr3 Integration**: Especially for users that already have experience with the `mlr3` framework, working with `mlr3torch` should feel familiar. Due to the integration into the `mlr3` framework, many `mlr3` features like hyperparameter tuning, preprocessing, and resampling are readily available for `mlr3torch`.
+
+## Brief `mlr3` Recap
+
+Before we dive into `mlr3torch`, we will briefly review the core building blocks of the `mlr3` machine learning framework.
+
+### Task
+
+A task is a machine learning problem on a dataset.
+It consists of the data itself and some metadata such as the features or the target variable.
+In order to create an example task that comes with `mlr3`, we can use the `tsk()` function:
+
+```{r}
+library(mlr3)
+tsk("mtcars")
+```
+
+To create a custom `Task` from a `data.frame`, we can use the `as_task_<type>` converters:
+```{r}
+head(mtcars)
+tsk_mtcars = as_task_regr(mtcars, id = "mtcars", target = "mpg")
+tsk_mtcars
+```
+
+### Learner
+
+A learner is a machine learning algorithm that can be `$train()`ed on a `Task` and `$predict()`ed on a `Task`.
+We can construct one by passing the name of the learner to the `lrn()` function.
+```{r}
+lrn_tree = lrn("regr.rpart")
+```
+
+
+Next, we need to split the data into a training and test set and apply the learner on the former.
+
+```{r}
+split = partition(tsk_mtcars, ratio = 0.8)
+lrn_tree$train(tsk_mtcars, row_ids = split$train)
+```
+
+The trained model can be accessed via the `$model` slot of the learner:
+```{r}
+print(lrn_tree$model)
+```
+
+In order to make predictions on the test set, we can use the `$predict()` method of the learner:
+```{r}
+predictions = lrn_tree$predict(tsk_mtcars, row_ids = split$test)
+```
+
+To make predictions on `data.frame`s we can use the `$predict_newdata()` method of the learner:
+```{r}
+new_data = mtcars[1:2, ]
+lrn_tree$predict_newdata(new_data)
+```
+
+
+### Performance Evaluation
+
+In order to assess the quality of the predictions, we can use a `Measure`.
+`mlr3` comes with many predefined measures and we can construct them by passing the name of the measure to the `msr()` function.
+Below, we construct the mean squared error measure -- which can only be applied to regression tasks -- and use it to evaluate the predictions.
+
+```{r}
+mse = msr("regr.mse")
+predictions$score(mse)
+```
+
+For more elaborate evaluation strategies, we can use `rsmp()` to define a `Resampling` strategy that can be executed using `resample()`.
+```{r}
+rsmp_cv = rsmp("cv", folds = 3)
+
+rr = resample(
+  task       = tsk_mtcars,
+  learner    = lrn_tree,
+  resampling = rsmp_cv
+)
+
+# Aggregate the results
+rr$aggregate(msr("regr.mse"))
+```
+
+
+### Learning Pipelines
+
+In many cases, however, we don't only fit a single learner, but a whole learning pipeline.
+Common use cases include the preprocessing of the data, e.g. for imputing missing values, scaling the data or encoding categorical features, but many other operations are possible.
+The `mlr3` extension `mlr3pipelines` is a toolbox for defining such learning pipelines.
+The core building block of `mlr3pipelines` is the `PipeOp` that can be constructed using the `po()` function.
+
+```{r}
+library(mlr3pipelines)
+pca = po("pca")
+```
+
+Just like a learner, it has a `$train()` and `$predict()` method and we can apply it to a `Task` using the `$train()` and `$predict()` methods.
+
+```{r}
+pca$train(list(tsk_mtcars))
+pca$predict(list(tsk_mtcars))[[1L]]
+```
+
+Usually, such `PipeOp`s are combined with a `Learner` into a full learning `Graph`.
+This is possible using the `%>>%` chain operator.
+
+```{r}
+library(mlr3pipelines)
+graph = po("pca") %>>% lrn("regr.rpart")
+print(graph)
+graph$plot(horizontal = TRUE)
+```
+
+The resulting `Graph` can be converted back into a `Learner` using the `as_learner()` function and used just like any other `Learner`.
+
+```{r}
+glrn = as_learner(graph)
+glrn$train(tsk_mtcars)
+```
+
+## Brief Introduction to `mlr3torch`
+
+`mlr3torch` builds upon the same ingredients as `mlr3`, only that we use Deep Learning `Learner`s, and can also work on non-tabular data.
+A simple example learner is the `lrn("regr.mlp")` learner, which is a Multi-Layer Perceptron (MLP) for regression tasks.
+
+### Using a Predefined Torch Learner
+
+```{r}
+library(mlr3torch)
+lrn_mlp = lrn("regr.mlp",
+  neurons = c(50, 50), # Two hidden layers with 50 neurons each
+  batch_size = 256, # Number of samples per gradient update
+  epochs = 30, # Number of training epochs
+  device = "auto", # Uses GPU if available, otherwise CPU
+  optimizer = t_opt("adam") # Adam optimizer
+)
+```
+
+This multi layer perceptron can be used just like the regression tree above.
+
+```{r}
+lrn_mlp$train(tsk_mtcars, row_ids = split$train)
+```
+
+The trained `nn_module` can be accessed via the `$model` slot of the learner:
+
+```{r}
+lrn_mlp$model$network
+```
+
+Besides the trained network, the `$model` of the learner e.g. also contains the `$state_dict()` and other information.
+
+Having trained the neural network on the training set, we can now make predictions on the test set:
+
+```{r}
+predictions = lrn_mlp$predict(tsk_mtcars, row_ids = split$test)
+predictions$score(msr("regr.mse"))
+```
+
+
+Using the benchmarking facilities of `mlr3`, we can also easily compare the regression tree with our deep learning learner:
+
+```{r}
+# Define the resampling strategy
+rsmp_cv = rsmp("cv", folds = 3)
+
+# Create a benchmark grid to compare both learners
+benchmark_grid = benchmark_grid(
+  tasks = tsk_mtcars,
+  learners = list(lrn_tree, lrn_mlp),
+  resampling = rsmp_cv
+)
+
+# Run the benchmark
+rr_benchmark = benchmark(benchmark_grid)
+
+# Aggregate the results
+results_benchmark = rr_benchmark$aggregate(msr("regr.mse"))
+
+# Print the results
+print(results_benchmark)
+```
+
+
+### Defining a Custom Torch Learner
+
+`mlr3torch` also allows to define custom architectures from `PipeOp`s.
+As a starting point in the graph, we need to mark the entry of the Neural Network using an ingress pipeop.
+Because we are working with a task with only one numeric feature, we can use `po("torch_ingress_num")`.
+There also exists inputs for categorical features (`po("torch_ingress_cat")`) and generic tensors (`po("torch_ingress_ltnsr")`).
+
+```{r}
+architecture = po("torch_ingress_num")
+```
+
+The next steps in the graph are the actual layers of the Neural Network.
+
+```{r}
+architecture = architecture %>>%
+  po("nn_linear_1", out_features = 100) %>>%
+  po("nn_relu_1") %>>%
+  po("nn_linear_2", out_features = 100) %>>%
+  po("nn_relu_2") %>>%
+  po("nn_head")
+
+architecture$plot(horizontal = TRUE)
+```
+
+After specifying the architecture, we need to set the remaining parts for the learner, which are the loss, optimizer and the remaining training confguration such as the epochs, device or the batch size.
+
+```{r}
+graph = architecture %>>%
+  po("torch_loss", loss = "mse") %>>%
+  po("torch_optimizer", optimizer = t_opt("adam")) %>>%
+  po("torch_model_regr", epochs = 10, batch_size = 256)
+```
+
+Just like before, we can convert the graph into a `Learner` using `as_learner()` and train it on the task:
+
+```{r}
+glrn = as_learner(graph)
+glrn$train(tsk_mtcars, row_ids = split$train)
+```
+
+### Working with Non-Tabular Data
+
+In the `mlr3` ecosystem, the data of a task is always stored in a `data.frame` or `data.table`.
+In order to be able to work with non-tabular data, the `mlr3torch` package offers a custom datatype, the `lazy_tensor`, which can stored in a `data.table`.
+
+As an example to showcast this, we can use the CIFAR-10 dataset, which is a dataset of 60,000 32x32 color images in 10 classes, with 6,000 images per class.
+
+TODO: Set eval = TRUE when cifar10 is available
+
+```{r, eval = FALSE}
+tsk_cifar = tsk("cifar10")
+tsk_cifar
+```
+
+When accessing the data, only the images are represented as `lazy_tensor`s, the labels are still stored as a factor column:
+
+```{r, eval = FALSE}
+tsk_cifar$head()
+```
+
+This datatype is very similar to the `torch::dataset` class we have seen earlier, and a dataset can be converted to a `lazy_tensor` using the `as_lazy_tensor()` function.
+
+```{r, eval = FALSE}
+lazy_tensor = as_lazy_tensor(tsk_cifar)
+```
+
+One of the main benefis of the `lazy_tensor` datatype is that it can be preprocessed using `PipeOp`s just like tabular data.
+Below, we flatten the images from shape `32x32x3` to shape `3072`.
+
+```{r, eval = FALSE}
+reshaper = po("trafo_reshape", shape = c(NA, 3072))
+tsk_cifar_flat = reshaper$train(list(tsk_cifar))[[1L]]
+tsk_cifar_flat$head()
+```
+
+Note that this transformation is not applied eagerily, but only when the data is actually loaded.
