@@ -2,6 +2,9 @@
 title: "Building Neural Networks with torch"
 ---
 
+TODO:
+* need to talk more about loss functions, i.e. cross-entropy.
+
 ```{r, include = FALSE}
 set.seed(123)
 torch::torch_manual_seed(123)

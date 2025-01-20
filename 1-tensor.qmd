@@ -280,7 +280,7 @@ t1 + t2
 
 There are some strict rules the define when two shapes are compatible:
 
-1. If tensors have different ranks (number of dimensions), prepend 1's to the shape of the lower rank tensor until ranks match
+1. If tensors have different number of dimensions, prepend 1's to the shape of the lower-dimensional tensor until they match
 2. Two dimensions are compatible when:
    * They are equal, or
    * One of them is 1 (which will be stretched to match the other)
@@ -382,7 +382,6 @@ The matrix can be transposed by changing the strides from `(4, 1)` to `(1, 4)`.
 y$t()$stride()
 ```
 
-</details>
 </details>
 :::
 

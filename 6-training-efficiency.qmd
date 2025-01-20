@@ -2,6 +2,9 @@
 title: "Speeding Up Training"
 ---
 
+TODO:
+* learning rate / optimizer state and freezing?
+
 ```{r, include = FALSE}
 set.seed(123)
 torch::torch_manual_seed(123)

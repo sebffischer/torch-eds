@@ -1,7 +1,12 @@
 ---
 title: "Optimizers"
 format: html
+bibliography: references.bib
 ---
+
+TODO:
+
+* Cite Papers for the optimizers
 
 ```{r, include = FALSE}
 set.seed(123)
@@ -9,53 +14,211 @@ torch::torch_manual_seed(123)
 source("helper.R")
 ```
 
-# Introduction to Optimizers
 
-In this notebook we will cover the main ideas of common optimizers used in deep learning, as well as how to use them in `torch`.
+## Overview
 
-TODO: Cite Papers for the optimizers
+In this notebook we will cover the optimization aspect of deep learning and how to work with optimizers in `torch`.
+Optimizers are algorithms that iteratively adjust the parameters of a neural network to minimize the loss function during training.
+They define how the networks *learn* from the data.
 
-Optimizers are algorithms that adjust the parameters of a neural network to minimize the loss function during training.
+Let's denote with $L(\theta)$ the loss function, which assigns the empirical risk given data $\{(x_i, y_i)\}_{i = 1}^n$ to a parameter vector $\theta$:
+$$L(\theta) = \sum_{i=1}^n L(f_\theta(x_i), y_i)$$
+Here $f_\theta$ is the model's prediction function, $x_i$ is the $i$-th sample in the training data and $y_i$ is the corresponding target value.
 
-The general update formula for parameter $w$ is given by:
+The goal of the optimizer is to find the parameter vector $\theta^*$ that minimizes the loss function $L(\theta)$:
+$$\theta^* = \arg \min_\theta L(\theta)$$
 
-$$w_{t+1} = w_t - \eta \frac{\partial L}{\partial w_t}$$
+This is done by iteratively updating the parameter vector $\theta$ using the gradient of the loss function with respect to the parameter vector.
+The simplified update formula for a parameter $\theta$ at time step $t$ is given by:
+
+$$\theta_{t+1} = \theta_t - \eta \frac{\partial L}{\partial \theta_t}$$
 
 
-- $w_t$ is the current value of the $i$-th parameter (like a weight or bias) at time step $t$
+- $\theta_t$ is the current value of the parameter vector at time step $t$
 
-- $w_{t+1}$ is the new value of the parameter after the update
+- $\theta_{t+1}$ is the new value of the parameter after the update
 
 - $\eta$ (eta) is the learning rate, which controls how big of a step we take
 
-- $\frac{\partial L}{\partial w_t}$ is the partial derivative of the loss function L with respect to parameter a, i.e., the gradient
+- $\frac{\partial L}{\partial \theta_t}$ is the derivative of the loss function $L$ with respect to parameter $\theta$, i.e., the gradient
+
+
+::: {.callout-note}
+## Quiz: Learning Rate
+
+Question 1: Can you explain what happens when the learning rate is too high? What happens when it is too low?
+
+<details>
+<summary>Click for answer</summary>
+A too high learning rate will cause the parameters to overshoot the minimum and diverge.
+A too low learning rate will cause the parameters to converge slowly.
+![](assets/lr_size.png)
+Source: https://stackoverflow.com/questions/62690725/small-learning-rate-vs-big-learning-rate
+</details>
+:::
 
 The optimizers used in practice differ from the above formula, as:
 
-1. The gradient is estimated from a mini-batch and not the whole dataset
+1. The gradient is estimated from a batch and not the whole training dataset
 2. The simplistic update formula from above is extended with:
    1. Weight decay
    2. Momentum
    3. Adaptive learning rates
 
-The state of the art optimization method in Deep Learning is AdamW, which is an improvement over Adam.
+Before we cover these more advanced approaches (specifically their implementation in AdamW), we will first focus on the vanilla version of Stochastic Gradient Descent (SGD).
 
 ## Mini-batch Effects in SGD
 
-When using mini-batches, the gradient becomes a noisy estimate of the true gradient over the full dataset:
+When using mini-batches, the gradient becomes a noisy estimate of the gradient over the full dataset.
+With $\nabla L^i_t := \frac{\partial L^i}{\partial \theta_t}$ being the gradient of the loss function with respect to the whole parameter vector estimated using $(x_i, y_i)$, the mini-batch gradient is given by:
 
-$$\nabla L_{\text{batch}} = \frac{1}{|B|} \sum_{i \in B} \nabla L_i$$
+$$\nabla L^B_t = \frac{1}{|B|} \sum_{i \in B} \nabla L^i_t$$
 
-where $B$ is the mini-batch of samples and $|B|$ is the batch size. This introduces several important effects:
+where $B$ is the batch of samples and $|B|$ is the batch size.
 
-1. **Noise as Regularization**: The noise in gradient estimates can help escape local minima and saddle points, acting as an implicit regularizer
-1. **Trade-offs with Batch Size**:
+The update formula for SGD is then given by
+$$\theta_{t+1} = \theta_t - \eta \nabla L^B_t$$
+
+
+This is visualized in the image below:
+
+![](assets/gd_vs_sgd.png)
+
+::: {.callout-note}
+## Quiz: Vanilla SGD
+
+Question 1: What will happen when the batch size is too small/large?
+
+<details>
+<summary>Click for answer</summary>
+**Trade-offs with Batch Size**:
+
    - Larger batches provide more accurate gradient estimates
    - Smaller batches introduce more noise but allow more frequent parameter updates
+![](assets/lr_size.png)
+</details>
+
+Question 2: The mini-batch gradient is an approximation of the gradient over the full dataset.
+Does the latter also approximate something? If so, what?
+
+
+<details>
+<summary>Click for answer</summary>
+In machine learning, we assume that the data is drawn from a distribution $P$.
+The gradient over the full dataset is an expectation over this distribution:
+$$\nabla L = \mathbb{E}_{x \sim P} \nabla L(f_\theta(x), y)$$
+The mini-batch gradient is an empirical estimate of this gradient, i.e. the expectation over a finite sample from the distribution.
+</details>
+:::
+
+Because deep learning models can have many parameters and computation of gradients is expensive, understanding the effects of different batchs sizes and convergence is important.
+The computational cost (which we here take to be the time it takes to perform one optimization step) of a gradient update using a batch size $b$ consists of:
+
+1. Loading the batch into memory (if the data does not fit into RAM)
+2. The forward pass of the model
+3. The backward pass of the model
+4. The update of the parameters
+
+We will look at 1. later and 4. does not depend on the batch size so we can ignore it.
+
+
+::: {.callout-note}
+## Quiz: Bang for your buck
+
+Question 1:
+True or False: The cost of performing a gradient update using batch size $2$ is twice the cost of a batch of size $1$.
+
+<details>
+<summary>Click for answer</summary>
+Generally, no.
+Because GPUs can perform many operations simultaneously, the cost of performing a gradient update using batch size $2$ is not twice the cost of a batch of size $1$.
+TODO: add tip to look at cuda_summary (or how it's called) to get overview of GPU utilization
+</details>
+
+Question 2:
+
+The standard error of the mini-batch gradient estimate (which characterizes the precision of the gradient estimate) can be written as
+
+$$\text{SE}_{\nabla L^B_t} = \frac{\sigma_{\nabla L_t}}{\sqrt{|B|}}$$
+
+where $\sigma_{\nabla L^B_t}$ is the standard deviation of the gradient estimate in relation to the batch size.
+
+Describe the dynamics of the standard error when increasing the batch size:
+How do you need to increase a batch size of $1$ to half the standard error? What about a batch size of $100$?
+
+<details>
+<summary>Click for answer</summary>
+The standard error decreases when increasing the batch size.
+However, there is a diminishing return as the batch size increases: When moving from 1 to 4, the standard error is halfed and when moving from 100 to 400 it is also halfed.
+
+```{r, echo = FALSE}
+df <- data.frame(
+  x = seq(0, 400, length.out = 400)
+)
+df$y <- sqrt(df$x)
+
+# Plot the square root function
+ggplot(df, aes(x = x, y = y)) +
+  geom_line(color = "blue", linewidth = 1) +
+  labs(
+    title = "Plot of the Square Root Function",
+    x = "x",
+    y = "sqrt(x)"
+  ) +
+  theme_minimal()
+```
+</details>
+
+:::
+
+## Mini-Batch Gradient Descent: It's not all about runtime
+
+As we have now covered some of the dynamics of a simple gradient-based optimizer, we can examine the final parameter vector $\theta^*$ that the optimizer converges to.
+When using a gradient-based optimizer, the updates will stop once the gradient is close to zero.
+What will now discuss the type of solutions where this is true and their properties.
+
+We need to distuingish *saddle points* from *local minima* from *global minima*:
+
+![](assets/minimum_vs_saddlepoint.png)
+
+In deep learning, where high-dimensional parameter spaces are common, saddle points are more likely to occur than local minima [@dauphin2014identifying].
+However, due to the stochastic nature of SGD, optimizers will find local minima instead of saddle points @pmlr-v80-daneshmand18a.
+
+
+::: {.callout-note}
+## Quiz: Local vs. Global Minima, Generalization
+
+Question 1: Do you believe SGD will find local or global minima? Explain your reasoning.
+
+<details>
+<summary>Click for answer</summary>
+Because the gradient only has **local** information about the loss function, SGD finds local minima.
+</details>
+
+
+Question 2: Assuming we have found a $\theta^*$ that has low training loss, does this ensure that we have found a good model?
+
+<details>
+<summary>Click for answer</summary>
+No, because we only know that the model has low training loss, but not the test loss.
+</details>
+:::
+
+SGD has been empirically shown to find solutions that generalize well to unseen data.
+This phenomenon is attributed to the implicit regularization effects of SGD, where the noise introduced by mini-batch sampling helps guide the optimizer towards broader minima with smaller L2 norms.
+These broader minima are typically associated with better generalization performance compared to sharp minima.
+
+![](assets/flat_minima_generalization.png)
+
+Source: https://www.researchgate.net/figure/Flat-minima-results-in-better-generalization-compared-to-sharp-minima-Pruning-neural_fig2_353068686
+
+These properties are also known as *implicit regularization* of SGD.
+Regularization generally refers to techniques that prevent overfitting and improve generalization.
+There are also explicit regularization techniques, which we will cover next.
 
 ### Weight Decay
 
-Because weight decay in optimizers is equivalent to regularization, we first need to understand the latter:
+Because weight decay in optimizers is equivalent to adding a regularization penalty term to the loss function, we can draw a parallel to the regularization techniques used in statistic such as ridge regression.
 Regularization in machine learning/statistics is used to prevent overfitting by adding a penalty term to the model’s loss function, which discourages overly complex models that might fit noise in the training data.
 It helps improve generalization to unseen data.
 For example, in ridge regression, the regularization term penalizes large coefficients by adding the squared magnitude of the coefficients to the loss function:
@@ -64,33 +227,67 @@ $$
 \mathcal{L}(y, \hat{y}) = \sum_{i=1}^n \left(y_i - \hat{y}_i\right)^2 + \lambda \sum_{j=1}^p \beta_j^2
 $$
 
+This will make the model prefer less complex solutions, where complexity is measured by the L2 norm of the coefficients.
+
+
 
 Here, $\lambda$ controls the strength of the regularization, $y_i$￼ are the observed values, $\hat{y}_i$ are the predicted values, and $w_i$ are the model coefficients.
 
 If we integrate weight decay into the gradient update formula, we get the following:
 
-$$w_{t+1} = w_t - \eta \big(\frac{\partial L}{\partial w_t} - \lambda w_t\big)$$
+$$\theta_{t+1} = \theta_t - \eta \big(\frac{\partial L}{\partial \theta_t} - \lambda \theta_t\big)$$
 
-This formula shows that the weight decay term ($- \lambda w_t$) effectively shrinks the weights during each update, helping to prevent overfitting.
-
+This formula shows that the weight decay term ($- \lambda \theta_t$) effectively shrinks the weights during each update, helping to prevent overfitting.
 
 ![](assets/regularization.png)
+
+::: {.callout-note}
+**Bias-Variance Tradeoff in Classical Statistics**
+
+In classical statistics and machine learning, the bias-variance tradeoff is a fundamental concept that describes the balance between two sources of error when building predictive models:
+
+- Bias: This refers to the error introduced by approximating a real-world problem, which may be complex, by a simplified model (e.g. a highly non-linear problem with a linear model).
+
+- Variance: This refers to the model's sensitivity to fluctuations in the training data. Complex models with many parameters typically exhibit high variance.
+
+The tradeoff implies that reducing bias increases variance and vice versa. The goal is to find an optimal balance where both bias and variance are minimized to achieve good generalization performance on unseen data.
+
+![](assets/bias_variance.png)
+
+Source: https://en.wikipedia.org/wiki/Bias%E2%80%93variance_tradeoff
+
+However, modern neural networks are heavily overparameterized, can fit the training data perfectly, thus have zero bias, but still generalize well to unseen data.
+Part of the explanation were the aforementioned implicit regularization effects of SGD.
+For more information on why deep neural networks tend to generalize well, see @zhang2021understanding.
+:::
 
 ## Momentum
 
 Momentum is a technique that helps accelerate gradient descent by using an exponential moving average of past gradients. Like a ball rolling down a hill, momentum helps the optimizer:
 
 - Move faster through areas of consistent gradient direction
-- Push through local minima and saddle points
+- Push through sharp local minima and saddle points
 - Dampen oscillations in areas where the gradient frequently changes direction
 
 The exponential moving momentum update can be expressed mathematically as:
 
-$$m_t = \beta m_{t-1} + (1-\beta)\nabla_w L(w_t)$$
-$$w_{t+1} = w_t - \eta \frac{m_t}{1 - \beta^t}$$
+$$
+(1 - \beta) \sum_{\tau=1}^{t} \beta^{t-\tau} \nabla_{\theta} \mathcal{L}(\theta_{\tau-1})
+$$
 
-where $\beta$ is the momentum decay rate (typically 0.9), $m_t$ is the exponential moving average of gradients, and $\eta$ is the learning rate.
-Note that dividing by $1 - \beta^t$ counteracts a bias because $m_0$ is initialized to $0$.
+In order to avoid having to keep track of all the gradients, we can calculate the update in two steps as follows:
+
+
+$$
+v_t = \beta_1 v_{t-1} + (1 - \beta_1) \nabla_\theta L(\theta_t)
+$$
+
+$$
+\theta_{t+1} = \theta_t - \eta \frac{v_t}{1 - \beta_1^t}
+$$
+
+The hyperparameter $\beta_1$ is the momentum decay rate (typically 0.9), $v_t$ is the exponential moving average of gradients, and $\eta$ is the learning rate as before.
+Note that dividing by $1 - \beta_1^t$ counteracts a bias because $v_0$ is initialized to $0$.
 
 ![](assets/momentum.png)
 
@@ -98,35 +295,40 @@ Note that dividing by $1 - \beta^t$ counteracts a bias because $m_0$ is initiali
 
 Adaptive learning rate methods automatically adjust the learning rate for each parameter during training. This is particularly useful because:
 
-1. Different parameters may require different learning rates - some parameters might need large updates while others need fine-tuning
-2. The optimal learning rate often changes during training - larger steps might be beneficial early on, while smaller steps are needed for fine-tuning later
-3. The gradient magnitude can vary significantly across different layers of deep networks
+1. Different parameters may require different learning rates.
+2. The optimal learning rate often changes during training.
 
-The basic idea can be expressed mathematically as:
+Before, we had one global learning rate $\eta$ for all parameters.
+However, learning rates are now allowed to:
 
-$$w_{t+1} = w_t - \eta_t \frac{\partial L}{\partial w_t}$$
+1. change over time
+2. be different for different parameters.
 
-where $\eta_t$ is a parameter-specific learning rate that adapts over time based on the optimization history.
+Our vanilla SGD update formula is now generalized to handle adaptive learning rates:
 
-In AdamW, the adaptive learning rate is primarily controlled by the second moment estimate (squared gradients):
+$$\theta_{t+1} = \theta_t - \eta_t \cdot \frac{\nabla_\theta L(\theta_t)}{\sqrt{v_t} + \epsilon}$$
+
+Here, $\eta_t$ is now not a scalar learning rate, but a vector of learning rates for each parameter and '$\cdot$' denotes the element-wise multiplication.
+Further, $\epsilon$ is a small constant for numerical stability.
+
+In AdamW, the adaptive learning rate is controlled by the second moment estimate (squared gradients):
 
 $$v_t = \beta_2 v_{t-1} + (1-\beta_2)(g_t)^2$$
 $$\hat{\eta}_t = \eta \frac{1}{\sqrt{v_t + \epsilon}}$$
 
-where:
-
-- $v_t$ is the exponential moving average of squared gradients
-- $\beta_2$ is the decay rate (typically 0.999)
-- $g_t$ is the current gradient
-- $\epsilon$ is a small constant for numerical stability
-
-This adaptive scaling helps:
-
-- Automatically decrease step sizes for parameters with large or noisy gradients
-- Increase step sizes for parameters with small, consistent gradients
-- Improve training stability without manual learning rate tuning
+In words this means: In steep directions where the gradient is large, the learning rate is small and vice versa.
+The parameters $\beta_2$ and $\epsilon$ are hyperparameters that control the decay rate and numerical stability of the second moment estimate.
 
 ![](assets/adagrad.png)
+
+When combining weight decay, adaptive learning rates and momentum, we get the AdamW optimizer.
+It therefore has parameters:
+* `lr`: The learning rate
+* `weight_decay`: The weight decay parameter
+* `betas`: The momentum parameters ($\beta_1$ and $\beta_2$)
+* `eps`: The numerical stability parameter
+
+Note that AdamW also has another configuration parameter `amsgrad`, which is disabled by default in `torch`, but which can help with convergence.
 
 # Optimizers in torch
 
@@ -138,12 +340,17 @@ The main optimizer API consists of:
 1. `zero_grad()`: Reset gradients of all the parameters to zero before each backward pass
 1. Just like `nn_module`s they have a `$state_dict()` which can e.g. be saved to later load it using `$load_state_dict()`.
 
-The standard way to create
 
+We will focus on the AdamW optimizer, but the others work analogously.
 ```{r}
 library(torch)
+formals(optim_adamw)
+```
+
+To construct it, we first need to create a model and then pass the parameters of the model to the optimizer so it knows which parameters to optimize.
+
+```{r}
 model = nn_linear(1, 1)
-# Create optimizer
 opt <- optim_adamw(model$parameters, lr = 0.2)
 ```
 
@@ -156,7 +363,24 @@ beta = torch_randn(1, 1)
 Y = X$matmul(beta) + torch_randn(1000)
 ```
 
-We can perform a single gradient `$step()` using the AdamW optimizer from above:
+This represents data from a simple linear model with some noise:
+
+```{r, echo = FALSE}
+ggplot(data.frame(X = as.numeric(X), Y = as.numeric(Y)), aes(x = X, y = Y)) +
+  geom_point() +
+  geom_smooth(method = "lm", formula = y ~ x) +
+  theme_minimal()
+```
+
+Performing a (full) gradient update using the AdamW optimizer consists of:
+
+
+1. A forward pass of the model
+  ```{r}
+  y_hat = model(X)
+  ```
+2. A backward pass of the model
+3. An optimizer step
 
 ```{r}
 loss = mean((model(X) - Y)^2)
@@ -177,9 +401,9 @@ opt$zero_grad()
 model$weight$grad
 ```
 
-## Visualizing AdamW Parameters
 
-TODO: I should add some questions here
+
+## Visualizing AdamW Parameters
 
 ### Parameter 1
 
@@ -243,6 +467,12 @@ The $\beta_2$ parameter is varied.
 betas2 = list(c(0, 0), c(0, 0.999))
 plot_adamw_trajectories(lr = 0.01, weight_decay = 0, epochs = 50, betas = betas2, batch_size = 16)
 ```
+
+
+## Setting Hyperparameters
+
+TODO: Cover how to set the hyperparameters for the optimizers, especially the learning rate (?)
+  are the defaults good?
 
 ## Saving an Optimizer
 
@@ -313,10 +543,11 @@ Implement a simple SGD optimizer with momentum and weight decay.
 
 Update formula for SGD with momentum and weight decay:
 $$v_t = \beta * v_{t-1} + (1 - \beta) * grad$$
-$$w_t = w_{t-1} - lr * (v_t + weight_decay * w_{t-1})$$
+$$\theta_t = \theta_{t-1} - lr * (v_t + \text{weight decay} * \theta_{t-1})$$
 
 
 # Rough R code implementation
+TODO: Use `torch::optimizer` to implement this.
 ```{r}
 sgd_momentum <- function(params, grads, lr, momentum, weight_decay) {
   # Initialize velocity if not already done
@@ -333,4 +564,5 @@ sgd_momentum <- function(params, grads, lr, momentum, weight_decay) {
   return(params)
 }
 ```
+
 

@@ -54,7 +54,27 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="4-optimizer_files/libs/clipboard/clipboard.min.js"></script>
@@ -125,22 +145,45 @@ window.Quarto = {
 </header>
 
 
-<section id="introduction-to-optimizers" class="level1">
-<h1>Introduction to Optimizers</h1>
-<p>In this notebook we will cover the main ideas of common optimizers used in deep learning, as well as how to use them in <code>torch</code>.</p>
-<p>TODO: Cite Papers for the optimizers</p>
-<p>Optimizers are algorithms that adjust the parameters of a neural network to minimize the loss function during training.</p>
-<p>The general update formula for parameter <span class="math inline">\(w\)</span> is given by:</p>
-<p><span class="math display">\[w_{t+1} = w_t - \eta \frac{\partial L}{\partial w_t}\]</span></p>
+<p>TODO:</p>
 <ul>
-<li><p><span class="math inline">\(w_t\)</span> is the current value of the <span class="math inline">\(i\)</span>-th parameter (like a weight or bias) at time step <span class="math inline">\(t\)</span></p></li>
-<li><p><span class="math inline">\(w_{t+1}\)</span> is the new value of the parameter after the update</p></li>
-<li><p><span class="math inline">\(\eta\)</span> (eta) is the learning rate, which controls how big of a step we take</p></li>
-<li><p><span class="math inline">\(\frac{\partial L}{\partial w_t}\)</span> is the partial derivative of the loss function L with respect to parameter a, i.e., the gradient</p></li>
+<li>Cite Papers for the optimizers</li>
 </ul>
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<p>In this notebook we will cover the optimization aspect of deep learning and how to work with optimizers in <code>torch</code>. Optimizers are algorithms that iteratively adjust the parameters of a neural network to minimize the loss function during training. They define how the networks <em>learn</em> from the data.</p>
+<p>Let’s denote with <span class="math inline">\(L(\theta)\)</span> the loss function, which assigns the empirical risk given data <span class="math inline">\(\{(x_i, y_i)\}_{i = 1}^n\)</span> to a parameter vector <span class="math inline">\(\theta\)</span>: <span class="math display">\[L(\theta) = \sum_{i=1}^n L(f_\theta(x_i), y_i)\]</span> Here <span class="math inline">\(f_\theta\)</span> is the model’s prediction function, <span class="math inline">\(x_i\)</span> is the <span class="math inline">\(i\)</span>-th sample in the training data and <span class="math inline">\(y_i\)</span> is the corresponding target value.</p>
+<p>The goal of the optimizer is to find the parameter vector <span class="math inline">\(\theta^*\)</span> that minimizes the loss function <span class="math inline">\(L(\theta)\)</span>: <span class="math display">\[\theta^* = \arg \min_\theta L(\theta)\]</span></p>
+<p>This is done by iteratively updating the parameter vector <span class="math inline">\(\theta\)</span> using the gradient of the loss function with respect to the parameter vector. The simplified update formula for a parameter <span class="math inline">\(\theta\)</span> at time step <span class="math inline">\(t\)</span> is given by:</p>
+<p><span class="math display">\[\theta_{t+1} = \theta_t - \eta \frac{\partial L}{\partial \theta_t}\]</span></p>
+<ul>
+<li><p><span class="math inline">\(\theta_t\)</span> is the current value of the parameter vector at time step <span class="math inline">\(t\)</span></p></li>
+<li><p><span class="math inline">\(\theta_{t+1}\)</span> is the new value of the parameter after the update</p></li>
+<li><p><span class="math inline">\(\eta\)</span> (eta) is the learning rate, which controls how big of a step we take</p></li>
+<li><p><span class="math inline">\(\frac{\partial L}{\partial \theta_t}\)</span> is the derivative of the loss function <span class="math inline">\(L\)</span> with respect to parameter <span class="math inline">\(\theta\)</span>, i.e., the gradient</p></li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Quiz: Learning Rate
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Question 1: Can you explain what happens when the learning rate is too high? What happens when it is too low?</p>
+<details>
+<summary>
+Click for answer
+</summary>
+A too high learning rate will cause the parameters to overshoot the minimum and diverge. A too low learning rate will cause the parameters to converge slowly. <img src="assets/lr_size.png" class="img-fluid"> Source: https://stackoverflow.com/questions/62690725/small-learning-rate-vs-big-learning-rate
+</details>
+</div>
+</div>
 <p>The optimizers used in practice differ from the above formula, as:</p>
 <ol type="1">
-<li>The gradient is estimated from a mini-batch and not the whole dataset</li>
+<li>The gradient is estimated from a batch and not the whole training dataset</li>
 <li>The simplistic update formula from above is extended with:
 <ol type="1">
 <li>Weight decay</li>
@@ -148,31 +191,164 @@ window.Quarto = {
 <li>Adaptive learning rates</li>
 </ol></li>
 </ol>
-<p>The state of the art optimization method in Deep Learning is AdamW, which is an improvement over Adam.</p>
+<p>Before we cover these more advanced approaches (specifically their implementation in AdamW), we will first focus on the vanilla version of Stochastic Gradient Descent (SGD).</p>
+</section>
 <section id="mini-batch-effects-in-sgd" class="level2">
 <h2 class="anchored" data-anchor-id="mini-batch-effects-in-sgd">Mini-batch Effects in SGD</h2>
-<p>When using mini-batches, the gradient becomes a noisy estimate of the true gradient over the full dataset:</p>
-<p><span class="math display">\[\nabla L_{\text{batch}} = \frac{1}{|B|} \sum_{i \in B} \nabla L_i\]</span></p>
-<p>where <span class="math inline">\(B\)</span> is the mini-batch of samples and <span class="math inline">\(|B|\)</span> is the batch size. This introduces several important effects:</p>
-<ol type="1">
-<li><strong>Noise as Regularization</strong>: The noise in gradient estimates can help escape local minima and saddle points, acting as an implicit regularizer</li>
-<li><strong>Trade-offs with Batch Size</strong>:
+<p>When using mini-batches, the gradient becomes a noisy estimate of the gradient over the full dataset. With <span class="math inline">\(\nabla L^i_t := \frac{\partial L^i}{\partial \theta_t}\)</span> being the gradient of the loss function with respect to the whole parameter vector estimated using <span class="math inline">\((x_i, y_i)\)</span>, the mini-batch gradient is given by:</p>
+<p><span class="math display">\[\nabla L^B_t = \frac{1}{|B|} \sum_{i \in B} \nabla L^i_t\]</span></p>
+<p>where <span class="math inline">\(B\)</span> is the batch of samples and <span class="math inline">\(|B|\)</span> is the batch size.</p>
+<p>The update formula for SGD is then given by <span class="math display">\[\theta_{t+1} = \theta_t - \eta \nabla L^B_t\]</span></p>
+<p>This is visualized in the image below:</p>
+<p><img src="assets/gd_vs_sgd.png" class="img-fluid"></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Quiz: Vanilla SGD
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Question 1: What will happen when the batch size is too small/large?</p>
+<details>
+<summary>
+Click for answer
+</summary>
+<p><strong>Trade-offs with Batch Size</strong>:</p>
 <ul>
 <li>Larger batches provide more accurate gradient estimates</li>
-<li>Smaller batches introduce more noise but allow more frequent parameter updates</li>
-</ul></li>
+<li>Smaller batches introduce more noise but allow more frequent parameter updates <img src="assets/lr_size.png" class="img-fluid"></li>
+</ul>
+</details>
+<p>Question 2: The mini-batch gradient is an approximation of the gradient over the full dataset. Does the latter also approximate something? If so, what?</p>
+<details>
+<summary>
+Click for answer
+</summary>
+In machine learning, we assume that the data is drawn from a distribution <span class="math inline">\(P\)</span>. The gradient over the full dataset is an expectation over this distribution: <span class="math display">\[\nabla L = \mathbb{E}_{x \sim P} \nabla L(f_\theta(x), y)\]</span> The mini-batch gradient is an empirical estimate of this gradient, i.e.&nbsp;the expectation over a finite sample from the distribution.
+</details>
+</div>
+</div>
+<p>Because deep learning models can have many parameters and computation of gradients is expensive, understanding the effects of different batchs sizes and convergence is important. The computational cost (which we here take to be the time it takes to perform one optimization step) of a gradient update using a batch size <span class="math inline">\(b\)</span> consists of:</p>
+<ol type="1">
+<li>Loading the batch into memory (if the data does not fit into RAM)</li>
+<li>The forward pass of the model</li>
+<li>The backward pass of the model</li>
+<li>The update of the parameters</li>
 </ol>
+<p>We will look at 1. later and 4. does not depend on the batch size so we can ignore it.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Quiz: Bang for your buck
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Question 1: True or False: The cost of performing a gradient update using batch size <span class="math inline">\(2\)</span> is twice the cost of a batch of size <span class="math inline">\(1\)</span>.</p>
+<details>
+<summary>
+Click for answer
+</summary>
+Generally, no. Because GPUs can perform many operations simultaneously, the cost of performing a gradient update using batch size <span class="math inline">\(2\)</span> is not twice the cost of a batch of size <span class="math inline">\(1\)</span>. TODO: add tip to look at cuda_summary (or how it’s called) to get overview of GPU utilization
+</details>
+<p>Question 2:</p>
+<p>The standard error of the mini-batch gradient estimate (which characterizes the precision of the gradient estimate) can be written as</p>
+<p><span class="math display">\[\text{SE}_{\nabla L^B_t} = \frac{\sigma_{\nabla L_t}}{\sqrt{|B|}}\]</span></p>
+<p>where <span class="math inline">\(\sigma_{\nabla L^B_t}\)</span> is the standard deviation of the gradient estimate in relation to the batch size.</p>
+<p>Describe the dynamics of the standard error when increasing the batch size: How do you need to increase a batch size of <span class="math inline">\(1\)</span> to half the standard error? What about a batch size of <span class="math inline">\(100\)</span>?</p>
+<details>
+<summary>
+Click for answer
+</summary>
+<p>The standard error decreases when increasing the batch size. However, there is a diminishing return as the batch size increases: When moving from 1 to 4, the standard error is halfed and when moving from 100 to 400 it is also halfed.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="4-optimizer_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</details>
+</div>
+</div>
+</section>
+<section id="mini-batch-gradient-descent-its-not-all-about-runtime" class="level2">
+<h2 class="anchored" data-anchor-id="mini-batch-gradient-descent-its-not-all-about-runtime">Mini-Batch Gradient Descent: It’s not all about runtime</h2>
+<p>As we have now covered some of the dynamics of a simple gradient-based optimizer, we can examine the final parameter vector <span class="math inline">\(\theta^*\)</span> that the optimizer converges to. When using a gradient-based optimizer, the updates will stop once the gradient is close to zero. What will now discuss the type of solutions where this is true and their properties.</p>
+<p>We need to distuingish <em>saddle points</em> from <em>local minima</em> from <em>global minima</em>:</p>
+<p><img src="assets/minimum_vs_saddlepoint.png" class="img-fluid"></p>
+<p>In deep learning, where high-dimensional parameter spaces are common, saddle points are more likely to occur than local minima <span class="citation" data-cites="dauphin2014identifying">(<a href="#ref-dauphin2014identifying" role="doc-biblioref">Dauphin et al. 2014</a>)</span>. However, due to the stochastic nature of SGD, optimizers will find local minima instead of saddle points <span class="citation" data-cites="pmlr-v80-daneshmand18a">Daneshmand et al. (<a href="#ref-pmlr-v80-daneshmand18a" role="doc-biblioref">2018</a>)</span>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Quiz: Local vs.&nbsp;Global Minima, Generalization
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Question 1: Do you believe SGD will find local or global minima? Explain your reasoning.</p>
+<details>
+<summary>
+Click for answer
+</summary>
+Because the gradient only has <strong>local</strong> information about the loss function, SGD finds local minima.
+</details>
+<p>Question 2: Assuming we have found a <span class="math inline">\(\theta^*\)</span> that has low training loss, does this ensure that we have found a good model?</p>
+<details>
+<summary>
+Click for answer
+</summary>
+No, because we only know that the model has low training loss, but not the test loss.
+</details>
+</div>
+</div>
+<p>SGD has been empirically shown to find solutions that generalize well to unseen data. This phenomenon is attributed to the implicit regularization effects of SGD, where the noise introduced by mini-batch sampling helps guide the optimizer towards broader minima with smaller L2 norms. These broader minima are typically associated with better generalization performance compared to sharp minima.</p>
+<p><img src="assets/flat_minima_generalization.png" class="img-fluid"></p>
+<p>Source: https://www.researchgate.net/figure/Flat-minima-results-in-better-generalization-compared-to-sharp-minima-Pruning-neural_fig2_353068686</p>
+<p>These properties are also known as <em>implicit regularization</em> of SGD. Regularization generally refers to techniques that prevent overfitting and improve generalization. There are also explicit regularization techniques, which we will cover next.</p>
 <section id="weight-decay" class="level3">
 <h3 class="anchored" data-anchor-id="weight-decay">Weight Decay</h3>
-<p>Because weight decay in optimizers is equivalent to regularization, we first need to understand the latter: Regularization in machine learning/statistics is used to prevent overfitting by adding a penalty term to the model’s loss function, which discourages overly complex models that might fit noise in the training data. It helps improve generalization to unseen data. For example, in ridge regression, the regularization term penalizes large coefficients by adding the squared magnitude of the coefficients to the loss function:</p>
+<p>Because weight decay in optimizers is equivalent to adding a regularization penalty term to the loss function, we can draw a parallel to the regularization techniques used in statistic such as ridge regression. Regularization in machine learning/statistics is used to prevent overfitting by adding a penalty term to the model’s loss function, which discourages overly complex models that might fit noise in the training data. It helps improve generalization to unseen data. For example, in ridge regression, the regularization term penalizes large coefficients by adding the squared magnitude of the coefficients to the loss function:</p>
 <p><span class="math display">\[
 \mathcal{L}(y, \hat{y}) = \sum_{i=1}^n \left(y_i - \hat{y}_i\right)^2 + \lambda \sum_{j=1}^p \beta_j^2
 \]</span></p>
+<p>This will make the model prefer less complex solutions, where complexity is measured by the L2 norm of the coefficients.</p>
 <p>Here, <span class="math inline">\(\lambda\)</span> controls the strength of the regularization, <span class="math inline">\(y_i\)</span>￼ are the observed values, <span class="math inline">\(\hat{y}_i\)</span> are the predicted values, and <span class="math inline">\(w_i\)</span> are the model coefficients.</p>
 <p>If we integrate weight decay into the gradient update formula, we get the following:</p>
-<p><span class="math display">\[w_{t+1} = w_t - \eta \big(\frac{\partial L}{\partial w_t} - \lambda w_t\big)\]</span></p>
-<p>This formula shows that the weight decay term (<span class="math inline">\(- \lambda w_t\)</span>) effectively shrinks the weights during each update, helping to prevent overfitting.</p>
+<p><span class="math display">\[\theta_{t+1} = \theta_t - \eta \big(\frac{\partial L}{\partial \theta_t} - \lambda \theta_t\big)\]</span></p>
+<p>This formula shows that the weight decay term (<span class="math inline">\(- \lambda \theta_t\)</span>) effectively shrinks the weights during each update, helping to prevent overfitting.</p>
 <p><img src="assets/regularization.png" class="img-fluid"></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Bias-Variance Tradeoff in Classical Statistics</strong></p>
+<p>In classical statistics and machine learning, the bias-variance tradeoff is a fundamental concept that describes the balance between two sources of error when building predictive models:</p>
+<ul>
+<li><p>Bias: This refers to the error introduced by approximating a real-world problem, which may be complex, by a simplified model (e.g.&nbsp;a highly non-linear problem with a linear model).</p></li>
+<li><p>Variance: This refers to the model’s sensitivity to fluctuations in the training data. Complex models with many parameters typically exhibit high variance.</p></li>
+</ul>
+<p>The tradeoff implies that reducing bias increases variance and vice versa. The goal is to find an optimal balance where both bias and variance are minimized to achieve good generalization performance on unseen data.</p>
+<p><img src="assets/bias_variance.png" class="img-fluid"></p>
+<p>Source: https://en.wikipedia.org/wiki/Bias%E2%80%93variance_tradeoff</p>
+<p>However, modern neural networks are heavily overparameterized, can fit the training data perfectly, thus have zero bias, but still generalize well to unseen data. Part of the explanation were the aforementioned implicit regularization effects of SGD. For more information on why deep neural networks tend to generalize well, see <span class="citation" data-cites="zhang2021understanding">Zhang et al. (<a href="#ref-zhang2021understanding" role="doc-biblioref">2021</a>)</span>.</p>
+</div>
+</div>
 </section>
 </section>
 <section id="momentum" class="level2">
@@ -180,42 +356,44 @@ window.Quarto = {
 <p>Momentum is a technique that helps accelerate gradient descent by using an exponential moving average of past gradients. Like a ball rolling down a hill, momentum helps the optimizer:</p>
 <ul>
 <li>Move faster through areas of consistent gradient direction</li>
-<li>Push through local minima and saddle points</li>
+<li>Push through sharp local minima and saddle points</li>
 <li>Dampen oscillations in areas where the gradient frequently changes direction</li>
 </ul>
 <p>The exponential moving momentum update can be expressed mathematically as:</p>
-<p><span class="math display">\[m_t = \beta m_{t-1} + (1-\beta)\nabla_w L(w_t)\]</span> <span class="math display">\[w_{t+1} = w_t - \eta \frac{m_t}{1 - \beta^t}\]</span></p>
-<p>where <span class="math inline">\(\beta\)</span> is the momentum decay rate (typically 0.9), <span class="math inline">\(m_t\)</span> is the exponential moving average of gradients, and <span class="math inline">\(\eta\)</span> is the learning rate. Note that dividing by <span class="math inline">\(1 - \beta^t\)</span> counteracts a bias because <span class="math inline">\(m_0\)</span> is initialized to <span class="math inline">\(0\)</span>.</p>
+<p><span class="math display">\[
+(1 - \beta) \sum_{\tau=1}^{t} \beta^{t-\tau} \nabla_{\theta} \mathcal{L}(\theta_{\tau-1})
+\]</span></p>
+<p>In order to avoid having to keep track of all the gradients, we can calculate the update in two steps as follows:</p>
+<p><span class="math display">\[
+v_t = \beta_1 v_{t-1} + (1 - \beta_1) \nabla_\theta L(\theta_t)
+\]</span></p>
+<p><span class="math display">\[
+\theta_{t+1} = \theta_t - \eta \frac{v_t}{1 - \beta_1^t}
+\]</span></p>
+<p>The hyperparameter <span class="math inline">\(\beta_1\)</span> is the momentum decay rate (typically 0.9), <span class="math inline">\(v_t\)</span> is the exponential moving average of gradients, and <span class="math inline">\(\eta\)</span> is the learning rate as before. Note that dividing by <span class="math inline">\(1 - \beta_1^t\)</span> counteracts a bias because <span class="math inline">\(v_0\)</span> is initialized to <span class="math inline">\(0\)</span>.</p>
 <p><img src="assets/momentum.png" class="img-fluid"></p>
 </section>
 <section id="adaptive-learning-rates" class="level2">
 <h2 class="anchored" data-anchor-id="adaptive-learning-rates">Adaptive Learning Rates</h2>
 <p>Adaptive learning rate methods automatically adjust the learning rate for each parameter during training. This is particularly useful because:</p>
 <ol type="1">
-<li>Different parameters may require different learning rates - some parameters might need large updates while others need fine-tuning</li>
-<li>The optimal learning rate often changes during training - larger steps might be beneficial early on, while smaller steps are needed for fine-tuning later</li>
-<li>The gradient magnitude can vary significantly across different layers of deep networks</li>
+<li>Different parameters may require different learning rates.</li>
+<li>The optimal learning rate often changes during training.</li>
 </ol>
-<p>The basic idea can be expressed mathematically as:</p>
-<p><span class="math display">\[w_{t+1} = w_t - \eta_t \frac{\partial L}{\partial w_t}\]</span></p>
-<p>where <span class="math inline">\(\eta_t\)</span> is a parameter-specific learning rate that adapts over time based on the optimization history.</p>
-<p>In AdamW, the adaptive learning rate is primarily controlled by the second moment estimate (squared gradients):</p>
+<p>Before, we had one global learning rate <span class="math inline">\(\eta\)</span> for all parameters. However, learning rates are now allowed to:</p>
+<ol type="1">
+<li>change over time</li>
+<li>be different for different parameters.</li>
+</ol>
+<p>Our vanilla SGD update formula is now generalized to handle adaptive learning rates:</p>
+<p><span class="math display">\[\theta_{t+1} = \theta_t - \eta_t \cdot \frac{\nabla_\theta L(\theta_t)}{\sqrt{v_t} + \epsilon}\]</span></p>
+<p>Here, <span class="math inline">\(\eta_t\)</span> is now not a scalar learning rate, but a vector of learning rates for each parameter and ‘<span class="math inline">\(\cdot\)</span>’ denotes the element-wise multiplication. Further, <span class="math inline">\(\epsilon\)</span> is a small constant for numerical stability.</p>
+<p>In AdamW, the adaptive learning rate is controlled by the second moment estimate (squared gradients):</p>
 <p><span class="math display">\[v_t = \beta_2 v_{t-1} + (1-\beta_2)(g_t)^2\]</span> <span class="math display">\[\hat{\eta}_t = \eta \frac{1}{\sqrt{v_t + \epsilon}}\]</span></p>
-<p>where:</p>
-<ul>
-<li><span class="math inline">\(v_t\)</span> is the exponential moving average of squared gradients</li>
-<li><span class="math inline">\(\beta_2\)</span> is the decay rate (typically 0.999)</li>
-<li><span class="math inline">\(g_t\)</span> is the current gradient</li>
-<li><span class="math inline">\(\epsilon\)</span> is a small constant for numerical stability</li>
-</ul>
-<p>This adaptive scaling helps:</p>
-<ul>
-<li>Automatically decrease step sizes for parameters with large or noisy gradients</li>
-<li>Increase step sizes for parameters with small, consistent gradients</li>
-<li>Improve training stability without manual learning rate tuning</li>
-</ul>
+<p>In words this means: In steep directions where the gradient is large, the learning rate is small and vice versa. The parameters <span class="math inline">\(\beta_2\)</span> and <span class="math inline">\(\epsilon\)</span> are hyperparameters that control the decay rate and numerical stability of the second moment estimate.</p>
 <p><img src="assets/adagrad.png" class="img-fluid"></p>
-</section>
+<p>When combining weight decay, adaptive learning rates and momentum, we get the AdamW optimizer. It therefore has parameters: * <code>lr</code>: The learning rate * <code>weight_decay</code>: The weight decay parameter * <code>betas</code>: The momentum parameters (<span class="math inline">\(\beta_1\)</span> and <span class="math inline">\(\beta_2\)</span>) * <code>eps</code>: The numerical stability parameter</p>
+<p>Note that AdamW also has another configuration parameter <code>amsgrad</code>, which is disabled by default in <code>torch</code>, but which can help with convergence.</p>
 </section>
 <section id="optimizers-in-torch" class="level1">
 <h1>Optimizers in torch</h1>
@@ -226,42 +404,84 @@ window.Quarto = {
 <li><code>zero_grad()</code>: Reset gradients of all the parameters to zero before each backward pass</li>
 <li>Just like <code>nn_module</code>s they have a <code>$state_dict()</code> which can e.g.&nbsp;be saved to later load it using <code>$load_state_dict()</code>.</li>
 </ol>
-<p>The standard way to create</p>
+<p>We will focus on the AdamW optimizer, but the others work analogously.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(torch)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>model <span class="ot">=</span> <span class="fu">nn_linear</span>(<span class="dv">1</span>, <span class="dv">1</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create optimizer</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>opt <span class="ot">&lt;-</span> <span class="fu">optim_adamw</span>(model<span class="sc">$</span>parameters, <span class="at">lr =</span> <span class="fl">0.2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">formals</span>(optim_adamw)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$params
+
+
+$lr
+[1] 0.001
+
+$betas
+c(0.9, 0.999)
+
+$eps
+[1] 1e-08
+
+$weight_decay
+[1] 0.01
+
+$amsgrad
+[1] FALSE</code></pre>
+</div>
+</div>
+<p>To construct it, we first need to create a model and then pass the parameters of the model to the optimizer so it knows which parameters to optimize.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">=</span> <span class="fu">nn_linear</span>(<span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>opt <span class="ot">&lt;-</span> <span class="fu">optim_adamw</span>(model<span class="sc">$</span>parameters, <span class="at">lr =</span> <span class="fl">0.2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>To illustrate the optimizer, we will again generate some synthetic training data:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">torch_manual_seed</span>(<span class="dv">1</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>X <span class="ot">=</span> <span class="fu">torch_randn</span>(<span class="dv">1000</span>, <span class="dv">1</span>)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>beta <span class="ot">=</span> <span class="fu">torch_randn</span>(<span class="dv">1</span>, <span class="dv">1</span>)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>Y <span class="ot">=</span> X<span class="sc">$</span><span class="fu">matmul</span>(beta) <span class="sc">+</span> <span class="fu">torch_randn</span>(<span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">torch_manual_seed</span>(<span class="dv">1</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>X <span class="ot">=</span> <span class="fu">torch_randn</span>(<span class="dv">1000</span>, <span class="dv">1</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>beta <span class="ot">=</span> <span class="fu">torch_randn</span>(<span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>Y <span class="ot">=</span> X<span class="sc">$</span><span class="fu">matmul</span>(beta) <span class="sc">+</span> <span class="fu">torch_randn</span>(<span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>We can perform a single gradient <code>$step()</code> using the AdamW optimizer from above:</p>
+<p>This represents data from a simple linear model with some noise:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>loss <span class="ot">=</span> <span class="fu">mean</span>((<span class="fu">model</span>(X) <span class="sc">-</span> Y)<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>loss<span class="sc">$</span><span class="fu">backward</span>()</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>opt<span class="sc">$</span><span class="fu">step</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="4-optimizer_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Performing a (full) gradient update using the AdamW optimizer consists of:</p>
+<ol type="1">
+<li>A forward pass of the model</li>
+</ol>
+<p>::: {.cell}</p>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>y_hat <span class="ot">=</span> <span class="fu">model</span>(X)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>:::</p>
+<ol start="2" type="1">
+<li>A backward pass of the model</li>
+<li>An optimizer step</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>loss <span class="ot">=</span> <span class="fu">mean</span>((<span class="fu">model</span>(X) <span class="sc">-</span> Y)<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>loss<span class="sc">$</span><span class="fu">backward</span>()</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>opt<span class="sc">$</span><span class="fu">step</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>NULL</code></pre>
 </div>
 </div>
 <p>Note that even after the optimizer step, the gradients are not reset to zero.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>model<span class="sc">$</span>weight<span class="sc">$</span>grad</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>model<span class="sc">$</span>weight<span class="sc">$</span>grad</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>torch_tensor
- 0.3670
+ 0.6365
 [ CPUFloatType{1,1} ]</code></pre>
 </div>
 </div>
 <p>We can conveniently set all gradients of the parameters managed by the optimizer to zero using <code>$zero_grad()</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>opt<span class="sc">$</span><span class="fu">zero_grad</span>()</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>model<span class="sc">$</span>weight<span class="sc">$</span>grad</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>opt<span class="sc">$</span><span class="fu">zero_grad</span>()</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>model<span class="sc">$</span>weight<span class="sc">$</span>grad</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>torch_tensor
  0
@@ -270,7 +490,6 @@ window.Quarto = {
 </div>
 <section id="visualizing-adamw-parameters" class="level2">
 <h2 class="anchored" data-anchor-id="visualizing-adamw-parameters">Visualizing AdamW Parameters</h2>
-<p>TODO: I should add some questions here</p>
 <section id="parameter-1" class="level3">
 <h3 class="anchored" data-anchor-id="parameter-1">Parameter 1</h3>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -293,10 +512,16 @@ The learning rate is varied.
 </div>
 </div>
 <div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 50
+[1] 50
+[1] 50
+[1] 50</code></pre>
+</div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="4-optimizer_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="4-optimizer_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -324,10 +549,16 @@ The weight decay is varied.
 </div>
 </div>
 <div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 250
+[1] 250
+[1] 250
+[1] 250</code></pre>
+</div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="4-optimizer_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="4-optimizer_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -355,10 +586,14 @@ The momentum parameter <span class="math inline">\(\beta_1\)</span> is varied. W
 </div>
 </div>
 <div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2000
+[1] 2000</code></pre>
+</div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="4-optimizer_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="768"></p>
+<p><img src="4-optimizer_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="768"></p>
 </figure>
 </div>
 </div>
@@ -386,21 +621,29 @@ The <span class="math inline">\(\beta_2\)</span> parameter is varied.
 </div>
 </div>
 <div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 350
+[1] 350</code></pre>
+</div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="4-optimizer_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="768"></p>
+<p><img src="4-optimizer_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="768"></p>
 </figure>
 </div>
 </div>
 </div>
 </section>
 </section>
+<section id="setting-hyperparameters" class="level2">
+<h2 class="anchored" data-anchor-id="setting-hyperparameters">Setting Hyperparameters</h2>
+<p>TODO: Cover how to set the hyperparameters for the optimizers, especially the learning rate (?) are the defaults good?</p>
+</section>
 <section id="saving-an-optimizer" class="level2">
 <h2 class="anchored" data-anchor-id="saving-an-optimizer">Saving an Optimizer</h2>
 <p>In order to resume training at a later stage, we can save the optimizer’s state using <code>$state_dict()</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>state_dict <span class="ot">=</span> opt<span class="sc">$</span><span class="fu">state_dict</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>state_dict <span class="ot">=</span> opt<span class="sc">$</span><span class="fu">state_dict</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>This state dictionary contains:</p>
 <ol type="1">
@@ -408,7 +651,7 @@ The <span class="math inline">\(\beta_2\)</span> parameter is varied.
 <li>The <code>$state</code> which contains the optimizer’s internal state, such as the momentum and second moment estimates</li>
 </ol>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>state_dict<span class="sc">$</span>param_groups[[<span class="dv">1</span>L]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>state_dict<span class="sc">$</span>param_groups[[<span class="dv">1</span>L]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>$params
 [1] 1 2
@@ -441,41 +684,166 @@ Note
 <div class="callout-body-container callout-body">
 <p>It is possible to set different parameters (such as learning rate) for different parameter groups.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>o2 <span class="ot">=</span> <span class="fu">optim_adamw</span>(<span class="fu">list</span>(</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">params =</span> <span class="fu">torch_tensor</span>(<span class="dv">1</span>), <span class="at">lr =</span> <span class="dv">1</span>),</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">params =</span> <span class="fu">torch_tensor</span>(<span class="dv">2</span>), <span class="at">lr =</span> <span class="dv">2</span>)</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>))</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>o2<span class="sc">$</span>param_groups[[<span class="dv">1</span>L]]<span class="sc">$</span>lr</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>o2 <span class="ot">=</span> <span class="fu">optim_adamw</span>(<span class="fu">list</span>(</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">params =</span> <span class="fu">torch_tensor</span>(<span class="dv">1</span>), <span class="at">lr =</span> <span class="dv">1</span>),</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">params =</span> <span class="fu">torch_tensor</span>(<span class="dv">2</span>), <span class="at">lr =</span> <span class="dv">2</span>)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>))</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>o2<span class="sc">$</span>param_groups[[<span class="dv">1</span>L]]<span class="sc">$</span>lr</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 1</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>o2<span class="sc">$</span>param_groups[[<span class="dv">2</span>L]]<span class="sc">$</span>lr</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>o2<span class="sc">$</span>param_groups[[<span class="dv">2</span>L]]<span class="sc">$</span>lr</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 2</code></pre>
 </div>
 </div>
 </div>
 </div>
-<p>The <code>$state</code> field contains the state for each parameter:</p>
+<p>The <code>$state</code> field contains the state for each parameter, which is currently empty as we have not performed any updates yet.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>state_dict<span class="sc">$</span>state[[<span class="dv">1</span>]]<span class="sc">$</span>exp_avg</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>state_dict<span class="sc">$</span>state</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>torch_tensor
+<pre><code>$`1`
+$`1`$step
+torch_tensor
+1
+[ CPUFloatType{} ]
+
+$`1`$exp_avg
+torch_tensor
 0.01 *
- 3.6697
-[ CPUFloatType{1,1} ]</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>state_dict<span class="sc">$</span>state[[<span class="dv">2</span>]]<span class="sc">$</span>exp_avg</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>torch_tensor
- 0.1495
+ 6.3652
+[ CPUFloatType{1,1} ]
+
+$`1`$exp_avg_sq
+torch_tensor
+0.0001 *
+ 4.0516
+[ CPUFloatType{1,1} ]
+
+
+$`2`
+$`2`$step
+torch_tensor
+1
+[ CPUFloatType{} ]
+
+$`2`$exp_avg
+torch_tensor
+0.01 *
+ 1.4464
+[ CPUFloatType{1} ]
+
+$`2`$exp_avg_sq
+torch_tensor
+1e-05 *
+ 2.0920
 [ CPUFloatType{1} ]</code></pre>
 </div>
 </div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>step <span class="ot">=</span> <span class="cf">function</span>() {</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  opt<span class="sc">$</span><span class="fu">zero_grad</span>()</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  ((<span class="fu">model</span>(<span class="fu">torch_tensor</span>(<span class="dv">1</span>)) <span class="sc">-</span> <span class="fu">torch_tensor</span>(<span class="dv">1</span>))<span class="sc">^</span><span class="dv">2</span>)<span class="sc">$</span><span class="fu">backward</span>()</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  opt<span class="sc">$</span><span class="fu">step</span>()</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="fu">replicate</span>(<span class="fu">step</span>(), <span class="at">n =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[[1]]
+NULL
+
+[[2]]
+NULL</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>opt<span class="sc">$</span><span class="fu">state_dict</span>()<span class="sc">$</span>state</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$`1`
+$`1`$step
+torch_tensor
+3
+[ CPUFloatType{} ]
+
+$`1`$exp_avg
+torch_tensor
+-0.5690
+[ CPUFloatType{1,1} ]
+
+$`1`$exp_avg_sq
+torch_tensor
+0.01 *
+ 2.2054
+[ CPUFloatType{1,1} ]
+
+
+$`2`
+$`2`$step
+torch_tensor
+3
+[ CPUFloatType{} ]
+
+$`2`$exp_avg
+torch_tensor
+-0.6088
+[ CPUFloatType{1} ]
+
+$`2`$exp_avg_sq
+torch_tensor
+0.01 *
+ 2.1671
+[ CPUFloatType{1} ]</code></pre>
+</div>
+</div>
+<p>Just like for the <code>nn_module</code>, we can save this using <code>torch_save()</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>pth <span class="ot">=</span> <span class="fu">tempfile</span>(<span class="at">fileext =</span> <span class="st">".pth"</span>)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">torch_save</span>(state_dict, pth)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Then, if we later want to resume training, we can read the optimizer state, create a new optimizer and load the state.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>state_dict2 <span class="ot">=</span> <span class="fu">torch_load</span>(pth)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>opt2 <span class="ot">&lt;-</span> <span class="fu">optim_adamw</span>(model<span class="sc">$</span>parameters, <span class="at">lr =</span> <span class="fl">0.2</span>)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>opt2<span class="sc">$</span><span class="fu">load_state_dict</span>(state_dict2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
+</section>
+<section id="exercises" class="level1">
+<h1>Exercises:</h1>
+<p>Implement a simple SGD optimizer with momentum and weight decay.</p>
+<p>Update formula for SGD with momentum and weight decay: <span class="math display">\[v_t = \beta * v_{t-1} + (1 - \beta) * grad\]</span> <span class="math display">\[\theta_t = \theta_{t-1} - lr * (v_t + \text{weight decay} * \theta_{t-1})\]</span></p>
+</section>
+<section id="rough-r-code-implementation" class="level1">
+<h1>Rough R code implementation</h1>
+<p>TODO: Use <code>torch::optimizer</code> to implement this.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>sgd_momentum <span class="ot">&lt;-</span> <span class="cf">function</span>(params, grads, lr, momentum, weight_decay) {</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Initialize velocity if not already done</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.null</span>(params<span class="sc">$</span>velocity)) {</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>    params<span class="sc">$</span>velocity <span class="ot">&lt;-</span> <span class="fu">torch_zeros_like</span>(params<span class="sc">$</span>values)</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Update velocity</span></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>  params<span class="sc">$</span>velocity <span class="ot">&lt;-</span> momentum <span class="sc">*</span> params<span class="sc">$</span>velocity <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">-</span> momentum) <span class="sc">*</span> grads</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Update parameters with weight decay</span></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>  params<span class="sc">$</span>values <span class="ot">&lt;-</span> params<span class="sc">$</span>values <span class="sc">-</span> lr <span class="sc">*</span> (params<span class="sc">$</span>velocity <span class="sc">+</span> weight_decay <span class="sc">*</span> params<span class="sc">$</span>values)</span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(params)</span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
 </section>
 
-</main>
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-pmlr-v80-daneshmand18a" class="csl-entry" role="listitem">
+Daneshmand, Hadi, Jonas Kohler, Aurelien Lucchi, and Thomas Hofmann. 2018. <span>“Escaping Saddles with Stochastic Gradients.”</span> In <em>Proceedings of the 35th International Conference on Machine Learning</em>, edited by Jennifer Dy and Andreas Krause, 80:1155–64. Proceedings of Machine Learning Research. PMLR. <a href="https://proceedings.mlr.press/v80/daneshmand18a.html">https://proceedings.mlr.press/v80/daneshmand18a.html</a>.
+</div>
+<div id="ref-dauphin2014identifying" class="csl-entry" role="listitem">
+Dauphin, Yann N, Razvan Pascanu, Caglar Gulcehre, Kyunghyun Cho, Surya Ganguli, and Yoshua Bengio. 2014. <span>“Identifying and Attacking the Saddle Point Problem in High-Dimensional Non-Convex Optimization.”</span> <em>Advances in Neural Information Processing Systems</em> 27.
+</div>
+<div id="ref-zhang2021understanding" class="csl-entry" role="listitem">
+Zhang, Chiyuan, Samy Bengio, Moritz Hardt, Benjamin Recht, and Oriol Vinyals. 2021. <span>“Understanding Deep Learning (Still) Requires Rethinking Generalization.”</span> <em>Communications of the ACM</em> 64 (3): 107–15.
+</div>
+</div></section></div></main>
 <!-- /main column -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {

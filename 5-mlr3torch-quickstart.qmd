@@ -135,6 +135,11 @@ glrn = as_learner(graph)
 glrn$train(tsk_mtcars)
 ```
 
+
+### Hyperparameter Tuning
+
+TODO
+
 ## Brief Introduction to `mlr3torch`
 
 `mlr3torch` builds upon the same ingredients as `mlr3`, only that we use Deep Learning `Learner`s, and can also work on non-tabular data.
@@ -275,3 +280,9 @@ tsk_cifar_flat$head()
 ```
 
 Note that this transformation is not applied eagerily, but only when the data is actually loaded.
+
+
+TODO: Also show hyperparameter tuning of deep neural networks here.
+
+TODO:
+* Add exercises

@@ -1,10 +1,11 @@
 library(torch)
 library(ggplot2)
 
-run_adamw <- function(lr = 0.1, weight_decay = 0.01, epochs = 10, betas = c(0.9, 0.999), batch_size = 1) {
+run_adamw <- function(lr = 0.1, weight_decay = 0.01, epochs = 10, betas = c(0.9, 0.999), batch_size = 1, steps = epochs * (as.integer(ceiling(100 / batch_size)))) {
   w_true <- torch_tensor(0.4)
   b_true <- torch_tensor(0.7)
   data = with_torch_manual_seed({
+    # DONT CHANGE 100
     X = torch_randn(100, 1) * 0.5
     Y = X * w_true + b_true + torch_randn(1000) * 2
     list(X = X, Y = Y)
@@ -32,28 +33,29 @@ run_adamw <- function(lr = 0.1, weight_decay = 0.01, epochs = 10, betas = c(0.9,
   trajectory$w[1] = w$item()
   trajectory$b[1] = b$item()
 
-  for (e in 1:epochs) {
-    for (batch in seq_len(n_batches)) {
-      opt$zero_grad()
-      t = (e - 1) * n_batches + batch
-      batch_start <- ((batch - 1) * batch_size + 1)
-      batch_end <- min(batch * batch_size, n)
-      x_batch <- X[batch_start:batch_end, , drop = FALSE]
-      y_batch <- Y[batch_start:batch_end]
+  print(steps)
 
-      # Forward pass
-      y_pred <- x_batch * w + b
-      loss <- torch_mean((y_pred - y_batch)^2)
+  for (step in seq_len(steps)) {
+    opt$zero_grad()
+    batch <- step %% n_batches
+    if (batch == 0) batch <- n_batches  # Adjust for zero modulus
+    batch_start <- ((batch - 1) * batch_size + 1)
+    batch_end <- min(batch * batch_size, n)
+    x_batch <- X[batch_start:batch_end, , drop = FALSE]
+    y_batch <- Y[batch_start:batch_end]
 
-      # Backward pass and optimization step
-      loss$backward()
-      opt$step()
+    # Forward pass
+    y_pred <- x_batch * w + b
+    loss <- torch_mean((y_pred - y_batch)^2)
 
-      # Record trajectory
-      trajectory$step[t + 1] <- t
-      trajectory$w[t + 1] <- w$item()
-      trajectory$b[t + 1] <- b$item()
-    }
+    # Backward pass and optimization step
+    loss$backward()
+    opt$step()
+
+    # Record trajectory
+    trajectory$step[step + 1] <- step
+    trajectory$w[step + 1] <- w$item()
+    trajectory$b[step + 1] <- b$item()
   }
 
   a_range <- seq(-1.5, 1.5, length.out = 30)

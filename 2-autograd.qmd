@@ -2,6 +2,10 @@
 title: "Automatic Differentiation with torch"
 ---
 
+TODO:
+* Explain a bit more how autograd works under the hood.
+  we could e.g. illustrate how to implement a custom autograd function.
+
 ```{r, include = FALSE}
 set.seed(123)
 torch::torch_manual_seed(123)
@@ -25,7 +29,7 @@ These updates depend on calculating gradients of the loss with respect to model 
 To use autograd, tensors must have their `requires_grad` field be `TRUE`.
 This can either be set during construction, but also changed afterwards using the in-place modifier `$requires_grad_(TRUE)`.
 In the context of deep learning, we track the gradients of the weights of a neural network.
-The simpleste "neural network" is a linear model where we have slope $a$ and bias $b$ and a single input $x$.
+The simplest "neural network" is a linear model where we have slope $a$ and bias $b$ and a single input $x$.
 
 The forward pass is defined as:
 $\hat{y} = a \times x + b$
