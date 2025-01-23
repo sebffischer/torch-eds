@@ -374,3 +374,5 @@ Of course, better solutions exist for estimating a simple linear model, but the 
 
 1. Extend the approach in the notebook to multivariate regression.
 
+2. Build a custom autograd function.
+

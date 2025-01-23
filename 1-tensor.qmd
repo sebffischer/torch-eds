@@ -256,7 +256,27 @@ max(x)
 sd(x)
 ```
 
+Accessing elements from a tensor is also similar to R arrays and matrices, i.e. it is 1-based.
 
+```{r}
+x = matrix(1:6, nrow = 3)
+xt = torch_tensor(x)
+x[1:2, 1]
+xt[1:2, 1]
+```
+
+One difference between indexing of torch vectors and standard R vectors is the behavior with regards to negative indices.
+While R vectors will return the elements from the end, torch vectors will return the elements from the beginning.
+
+```{r}
+x[-1, 1]
+xt[-1, 1]
+```
+
+:::{.callout-warning}
+While (R) torch is 1-based, PyTorch is 0-based.
+When you are translating PyTorch code to R, you need to be careful with this.
+:::
 
 ## Broadcasting Rules
 
@@ -366,7 +386,6 @@ This means, e.g., that reshaping torch tensors can be considerably more efficien
 
 The functionality of strides is visualized in the image below.
 
-TODO: Include image
 ![2D Tensor Strides](assets/2D_tensor_strides.png){fig-align="center" width=100%}
 Source: [How to Represent a Tensor or ndarray](https://martinlwx.github.io/en/how-to-reprensent-a-tensor-or-ndarray/)
 

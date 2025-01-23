@@ -4,6 +4,8 @@ title: "Building Neural Networks with torch"
 
 TODO:
 * need to talk more about loss functions, i.e. cross-entropy.
+* Show some available modules like relu, convolutions, etc.
+  Probably should build a CNN
 
 ```{r, include = FALSE}
 set.seed(123)
@@ -577,4 +579,6 @@ This example demonstrates how torch's high-level components work together to bui
 - The `optimizer` handles parameter updates
 - The `dataset` and `dataloader` classes can be used together for loading data
 - The training loop brings it all together
+
+
 

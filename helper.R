@@ -33,8 +33,6 @@ run_adamw <- function(lr = 0.1, weight_decay = 0.01, epochs = 10, betas = c(0.9,
   trajectory$w[1] = w$item()
   trajectory$b[1] = b$item()
 
-  print(steps)
-
   for (step in seq_len(steps)) {
     opt$zero_grad()
     batch <- step %% n_batches
