@@ -326,8 +326,8 @@ Click for answer
 <pre><code># A tibble: 2 × 6
   expression      min   median `itr/sec` mem_alloc `gc/sec`
   &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 disk        18.95ms  20.59ms      48.0   13.65MB     13.7
-2 ram          8.28ms   9.18ms     106.     9.39MB     21.8</code></pre>
+1 disk        20.26ms   23.3ms      39.9   13.65MB    14.5 
+2 ram          9.39ms     12ms      55.9    9.39MB     9.32</code></pre>
 </div>
 </div>
 </details>
@@ -362,8 +362,8 @@ Click for answer
 <pre><code># A tibble: 2 × 6
   expression      min   median `itr/sec` mem_alloc `gc/sec`
   &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 tensor        4.6ms   5.28ms     158.    76.29KB     4.38
-2 array         8.6ms  10.02ms      87.3    9.38MB    16.9 </code></pre>
+1 tensor       4.73ms   6.52ms     137.    76.29KB     4.56
+2 array        8.52ms  12.01ms      59.9    9.38MB    13.0 </code></pre>
 </div>
 </div>
 </details>
@@ -397,8 +397,8 @@ Click for answer
 <pre><code># A tibble: 2 × 6
   expression      min   median `itr/sec` mem_alloc `gc/sec`
   &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 getbatch     1.62ms   2.12ms     450.     3.83KB     2.21
-2 getitem      6.99ms  22.85ms      31.6   54.69KB     3.95</code></pre>
+1 getbatch     1.73ms   2.09ms      451.    3.83KB     2.09
+2 getitem       4.7ms   5.28ms      183.   54.69KB     7.23</code></pre>
 </div>
 </div>
 </details>
@@ -492,8 +492,8 @@ Note
     d$new(params = params, lr = lr, betas = betas, eps = eps, 
         weight_decay = weight_decay, amsgrad = amsgrad)
 }
-&lt;bytecode: 0x12a53b0c0&gt;
-&lt;environment: 0x12a373158&gt;
+&lt;bytecode: 0x12dcf0e28&gt;
+&lt;environment: 0x12fbe4e48&gt;
 attr(,"Optimizer")
 &lt;optim_adamw&gt; object generator
   Inherits from: &lt;inherit&gt;
@@ -502,7 +502,7 @@ attr(,"Optimizer")
     loop_fun: function (group, param, g, p) 
     step: function (closure = NULL) 
     clone: function (deep = FALSE) 
-  Parent env: &lt;environment: 0x12a422000&gt;
+  Parent env: &lt;environment: 0x138c7f0e8&gt;
   Locked objects: FALSE
   Locked class: FALSE
   Portable: TRUE
@@ -517,8 +517,8 @@ attr(,"class")
     d$new(params = params, lr = lr, betas = betas, eps = eps, 
         weight_decay = weight_decay, amsgrad = amsgrad)
 }
-&lt;bytecode: 0x12a6da338&gt;
-&lt;environment: 0x12a6e0ff8&gt;
+&lt;bytecode: 0x1385c5cb8&gt;
+&lt;environment: 0x1385b90b0&gt;
 attr(,"Optimizer")
 &lt;optim_ignite_adamw&gt; object generator
 &lt;optim_ignite&gt; object generator
@@ -536,7 +536,7 @@ attr(,"Optimizer")
     .set_param_group_options: function (opt, list) 
     .zero_grad: function (opt) 
     .get_param_groups: function (ptr) 
-  Parent env: &lt;environment: 0x12a76ccb0&gt;
+  Parent env: &lt;environment: 0x138596e10&gt;
   Locked objects: FALSE
   Locked class: FALSE
   Portable: TRUE
@@ -572,8 +572,8 @@ disabled.</code></pre>
 <pre><code># A tibble: 2 × 6
   expression                            min  median `itr/sec` mem_alloc `gc/sec`
   &lt;bch:expr&gt;                       &lt;bch:tm&gt; &lt;bch:t&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 learner$train(task_sonar)           489ms   518ms      1.93    14.3MB     5.79
-2 learner_ignite$train(task_sonar)    181ms   216ms      4.70    10.7MB     4.70</code></pre>
+1 learner$train(task_sonar)           501ms   501ms      2.00    14.3MB     5.99
+2 learner_ignite$train(task_sonar)    184ms   198ms      4.73    10.7MB     4.73</code></pre>
 </div>
 </div>
 </section>
@@ -812,23 +812,23 @@ Tip
 <pre><code>List of 2
  $ train:Classes 'data.table' and 'data.frame': 40 obs. of  2 variables:
   ..$ epoch          : num [1:40] 10 20 30 40 50 60 70 80 90 100 ...
-  ..$ classif.logloss: num [1:40] 0.674 0.631 0.549 0.499 0.455 ...
+  ..$ classif.logloss: num [1:40] 0.678 0.643 0.569 0.515 0.478 ...
   ..- attr(*, ".internal.selfref")=&lt;externalptr&gt; 
  $ valid:Classes 'data.table' and 'data.frame': 40 obs. of  2 variables:
   ..$ epoch          : num [1:40] 10 20 30 40 50 60 70 80 90 100 ...
-  ..$ classif.logloss: num [1:40] 0.668 0.62 0.541 0.479 0.448 ...
+  ..$ classif.logloss: num [1:40] 0.667 0.618 0.536 0.469 0.436 ...
   ..- attr(*, ".internal.selfref")=&lt;externalptr&gt; </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(history<span class="sc">$</span>valid)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   epoch classif.logloss
    &lt;num&gt;           &lt;num&gt;
-1:    10       0.6679444
-2:    20       0.6201546
-3:    30       0.5413886
-4:    40       0.4786793
-5:    50       0.4482004
-6:    60       0.4326656</code></pre>
+1:    10       0.6665855
+2:    20       0.6176948
+3:    30       0.5364953
+4:    40       0.4694589
+5:    50       0.4363074
+6:    60       0.4153698</code></pre>
 </div>
 </div>
 <p>Below we plot the training and validation for the different epochs:</p>
@@ -958,7 +958,7 @@ They are both buffers as they only store the variance and running mean of all tr
 [ CPUFloatType{10,5} ][ grad_fn = &lt;NativeBatchNormBackward0&gt; ]</code></pre>
 </div>
 </div>
-<p>Which of the following statements (stored in vairiables <code>equal1</code> and <code>equal2</code>) do you think is true?</p>
+<p>Which of the following statements is true and why?</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>bn<span class="sc">$</span><span class="fu">eval</span>()</span>
 <span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>equal1 <span class="ot">=</span> <span class="fu">torch_equal</span>(</span>
@@ -971,19 +971,14 @@ They are both buffers as they only store the variance and running mean of all tr
 <span id="cb66-9"><a href="#cb66-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bn</span>(x[<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>, ])</span>
 <span id="cb66-10"><a href="#cb66-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Is the following statement true?</p>
 <details>
 <summary>
 Click for answer
 </summary>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>equal1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(equal1, equal2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] TRUE</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>equal2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] FALSE</code></pre>
+<pre><code>[1]  TRUE FALSE</code></pre>
 </div>
 </div>
 The first statement is true, because in evaluation mode, the module uses the running mean and variance of all training samples seen. The second statemnt is false, because the first tensor uses different means and variances for rows 1-2 and 3-4, while the second tensor uses the same mean and variance for all rows.
@@ -993,53 +988,53 @@ The first statement is true, because in evaluation mode, the module uses the run
 <p>To illustrate its effectiveness, we will define a simple CNN, with and without batch normalization, train it on CIFAR-10 and compare their performance.</p>
 <p>To build the neural networks, we will use <code>mlr3torch</code>, which allows to build architectures from <code>PipeOp</code>s. This makes the creation of network architectures easier, as we e.g.&nbsp;don’t have to specify auxiliary parameters (such as the input dimension of a linear layer). Recall that the <code>po("torch_ingress_ltnsr")</code> is a special <code>PipeOp</code> that that marks the input of the neural network. Note that <code>po("nn_relu_1")</code> is equivalent to <code>po("nn_relu", id = "nn_relu_1")</code>. We need to specify unique ID parameters as this is required in <code>mlr3pipelines</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>cnn_bn <span class="ot">=</span> <span class="fu">po</span>(<span class="st">"torch_ingress_ltnsr"</span>) <span class="sc">%&gt;&gt;%</span></span>
-<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_conv2d_1"</span>, <span class="at">out_channels =</span> <span class="dv">32</span>, <span class="at">kernel_size =</span> <span class="dv">3</span>, <span class="at">stride =</span> <span class="dv">1</span>, <span class="at">padding =</span> <span class="dv">1</span>) <span class="sc">%&gt;&gt;%</span></span>
-<span id="cb71-3"><a href="#cb71-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_batch_norm2d_1"</span>) <span class="sc">%&gt;&gt;%</span></span>
-<span id="cb71-4"><a href="#cb71-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_relu_1"</span>) <span class="sc">%&gt;&gt;%</span></span>
-<span id="cb71-5"><a href="#cb71-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_max_pool2d_1"</span>, <span class="at">kernel_size =</span> <span class="dv">2</span>, <span class="at">stride =</span> <span class="dv">2</span>) <span class="sc">%&gt;&gt;%</span></span>
-<span id="cb71-6"><a href="#cb71-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_conv2d_2"</span>, <span class="at">out_channels =</span> <span class="dv">64</span>, <span class="at">kernel_size =</span> <span class="dv">3</span>, <span class="at">stride =</span> <span class="dv">1</span>, <span class="at">padding =</span> <span class="dv">1</span>) <span class="sc">%&gt;&gt;%</span></span>
-<span id="cb71-7"><a href="#cb71-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_batch_norm2d_2"</span>) <span class="sc">%&gt;&gt;%</span></span>
-<span id="cb71-8"><a href="#cb71-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_relu_2"</span>) <span class="sc">%&gt;&gt;%</span></span>
-<span id="cb71-9"><a href="#cb71-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_max_pool2d_2"</span>, <span class="at">kernel_size =</span> <span class="dv">2</span>, <span class="at">stride =</span> <span class="dv">2</span>)</span>
-<span id="cb71-10"><a href="#cb71-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-11"><a href="#cb71-11" aria-hidden="true" tabindex="-1"></a>cnn <span class="ot">=</span> <span class="fu">po</span>(<span class="st">"torch_ingress_ltnsr"</span>) <span class="sc">%&gt;&gt;%</span></span>
-<span id="cb71-12"><a href="#cb71-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_conv2d_1"</span>, <span class="at">out_channels =</span> <span class="dv">32</span>, <span class="at">kernel_size =</span> <span class="dv">3</span>, <span class="at">stride =</span> <span class="dv">1</span>, <span class="at">padding =</span> <span class="dv">1</span>) <span class="sc">%&gt;&gt;%</span></span>
-<span id="cb71-13"><a href="#cb71-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_relu_1"</span>) <span class="sc">%&gt;&gt;%</span></span>
-<span id="cb71-14"><a href="#cb71-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_max_pool2d_1"</span>, <span class="at">kernel_size =</span> <span class="dv">2</span>, <span class="at">stride =</span> <span class="dv">2</span>) <span class="sc">%&gt;&gt;%</span></span>
-<span id="cb71-15"><a href="#cb71-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_conv2d"</span>, <span class="at">out_channels =</span> <span class="dv">64</span>, <span class="at">kernel_size =</span> <span class="dv">3</span>, <span class="at">stride =</span> <span class="dv">1</span>, <span class="at">padding =</span> <span class="dv">1</span>) <span class="sc">%&gt;&gt;%</span></span>
-<span id="cb71-16"><a href="#cb71-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_relu_2"</span>) <span class="sc">%&gt;&gt;%</span></span>
-<span id="cb71-17"><a href="#cb71-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_max_pool2d_2"</span>, <span class="at">kernel_size =</span> <span class="dv">2</span>, <span class="at">stride =</span> <span class="dv">2</span>)</span>
-<span id="cb71-18"><a href="#cb71-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-19"><a href="#cb71-19" aria-hidden="true" tabindex="-1"></a>head <span class="ot">=</span> <span class="fu">po</span>(<span class="st">"nn_flatten"</span>) <span class="sc">%&gt;&gt;%</span></span>
-<span id="cb71-20"><a href="#cb71-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_linear"</span>, <span class="at">out_features =</span> <span class="dv">128</span>) <span class="sc">%&gt;&gt;%</span></span>
-<span id="cb71-21"><a href="#cb71-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_relu"</span>) <span class="sc">%&gt;&gt;%</span></span>
-<span id="cb71-22"><a href="#cb71-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_head"</span>)</span>
-<span id="cb71-23"><a href="#cb71-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-24"><a href="#cb71-24" aria-hidden="true" tabindex="-1"></a>model <span class="ot">=</span> <span class="fu">po</span>(<span class="st">"torch_optimizer"</span>, <span class="at">optimizer =</span> <span class="fu">t_opt</span>(<span class="st">"adam"</span>, <span class="at">lr =</span> <span class="fl">0.003</span>)) <span class="sc">%&gt;&gt;%</span></span>
-<span id="cb71-25"><a href="#cb71-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"torch_model_classif"</span>,</span>
-<span id="cb71-26"><a href="#cb71-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">epochs =</span> <span class="dv">100</span>,</span>
-<span id="cb71-27"><a href="#cb71-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">batch_size =</span> <span class="dv">256</span>,</span>
-<span id="cb71-28"><a href="#cb71-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">predict_type =</span> <span class="st">"prob"</span>,</span>
-<span id="cb71-29"><a href="#cb71-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">device =</span> <span class="st">"cuda"</span></span>
-<span id="cb71-30"><a href="#cb71-30" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>cnn_bn <span class="ot">=</span> <span class="fu">po</span>(<span class="st">"torch_ingress_ltnsr"</span>) <span class="sc">%&gt;&gt;%</span></span>
+<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_conv2d_1"</span>, <span class="at">out_channels =</span> <span class="dv">32</span>, <span class="at">kernel_size =</span> <span class="dv">3</span>, <span class="at">stride =</span> <span class="dv">1</span>, <span class="at">padding =</span> <span class="dv">1</span>) <span class="sc">%&gt;&gt;%</span></span>
+<span id="cb69-3"><a href="#cb69-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_batch_norm2d_1"</span>) <span class="sc">%&gt;&gt;%</span></span>
+<span id="cb69-4"><a href="#cb69-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_relu_1"</span>) <span class="sc">%&gt;&gt;%</span></span>
+<span id="cb69-5"><a href="#cb69-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_max_pool2d_1"</span>, <span class="at">kernel_size =</span> <span class="dv">2</span>, <span class="at">stride =</span> <span class="dv">2</span>) <span class="sc">%&gt;&gt;%</span></span>
+<span id="cb69-6"><a href="#cb69-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_conv2d_2"</span>, <span class="at">out_channels =</span> <span class="dv">64</span>, <span class="at">kernel_size =</span> <span class="dv">3</span>, <span class="at">stride =</span> <span class="dv">1</span>, <span class="at">padding =</span> <span class="dv">1</span>) <span class="sc">%&gt;&gt;%</span></span>
+<span id="cb69-7"><a href="#cb69-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_batch_norm2d_2"</span>) <span class="sc">%&gt;&gt;%</span></span>
+<span id="cb69-8"><a href="#cb69-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_relu_2"</span>) <span class="sc">%&gt;&gt;%</span></span>
+<span id="cb69-9"><a href="#cb69-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_max_pool2d_2"</span>, <span class="at">kernel_size =</span> <span class="dv">2</span>, <span class="at">stride =</span> <span class="dv">2</span>)</span>
+<span id="cb69-10"><a href="#cb69-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb69-11"><a href="#cb69-11" aria-hidden="true" tabindex="-1"></a>cnn <span class="ot">=</span> <span class="fu">po</span>(<span class="st">"torch_ingress_ltnsr"</span>) <span class="sc">%&gt;&gt;%</span></span>
+<span id="cb69-12"><a href="#cb69-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_conv2d_1"</span>, <span class="at">out_channels =</span> <span class="dv">32</span>, <span class="at">kernel_size =</span> <span class="dv">3</span>, <span class="at">stride =</span> <span class="dv">1</span>, <span class="at">padding =</span> <span class="dv">1</span>) <span class="sc">%&gt;&gt;%</span></span>
+<span id="cb69-13"><a href="#cb69-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_relu_1"</span>) <span class="sc">%&gt;&gt;%</span></span>
+<span id="cb69-14"><a href="#cb69-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_max_pool2d_1"</span>, <span class="at">kernel_size =</span> <span class="dv">2</span>, <span class="at">stride =</span> <span class="dv">2</span>) <span class="sc">%&gt;&gt;%</span></span>
+<span id="cb69-15"><a href="#cb69-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_conv2d"</span>, <span class="at">out_channels =</span> <span class="dv">64</span>, <span class="at">kernel_size =</span> <span class="dv">3</span>, <span class="at">stride =</span> <span class="dv">1</span>, <span class="at">padding =</span> <span class="dv">1</span>) <span class="sc">%&gt;&gt;%</span></span>
+<span id="cb69-16"><a href="#cb69-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_relu_2"</span>) <span class="sc">%&gt;&gt;%</span></span>
+<span id="cb69-17"><a href="#cb69-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_max_pool2d_2"</span>, <span class="at">kernel_size =</span> <span class="dv">2</span>, <span class="at">stride =</span> <span class="dv">2</span>)</span>
+<span id="cb69-18"><a href="#cb69-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb69-19"><a href="#cb69-19" aria-hidden="true" tabindex="-1"></a>head <span class="ot">=</span> <span class="fu">po</span>(<span class="st">"nn_flatten"</span>) <span class="sc">%&gt;&gt;%</span></span>
+<span id="cb69-20"><a href="#cb69-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_linear"</span>, <span class="at">out_features =</span> <span class="dv">128</span>) <span class="sc">%&gt;&gt;%</span></span>
+<span id="cb69-21"><a href="#cb69-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_relu"</span>) <span class="sc">%&gt;&gt;%</span></span>
+<span id="cb69-22"><a href="#cb69-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_head"</span>)</span>
+<span id="cb69-23"><a href="#cb69-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb69-24"><a href="#cb69-24" aria-hidden="true" tabindex="-1"></a>model <span class="ot">=</span> <span class="fu">po</span>(<span class="st">"torch_optimizer"</span>, <span class="at">optimizer =</span> <span class="fu">t_opt</span>(<span class="st">"adam"</span>, <span class="at">lr =</span> <span class="fl">0.003</span>)) <span class="sc">%&gt;&gt;%</span></span>
+<span id="cb69-25"><a href="#cb69-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"torch_model_classif"</span>,</span>
+<span id="cb69-26"><a href="#cb69-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">epochs =</span> <span class="dv">100</span>,</span>
+<span id="cb69-27"><a href="#cb69-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">batch_size =</span> <span class="dv">256</span>,</span>
+<span id="cb69-28"><a href="#cb69-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">predict_type =</span> <span class="st">"prob"</span>,</span>
+<span id="cb69-29"><a href="#cb69-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">device =</span> <span class="st">"cuda"</span></span>
+<span id="cb69-30"><a href="#cb69-30" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We evaluate the two models on the CIFAR-10 image classification task that we have introduced earlier. There, the goal is to classify images into 10 different classes.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a>net_bn <span class="ot">=</span> <span class="fu">as_learner</span>(cnn_bn <span class="sc">%&gt;&gt;%</span> head <span class="sc">%&gt;&gt;%</span> model)</span>
-<span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a>net_bn<span class="sc">$</span>id <span class="ot">=</span> <span class="st">"net_bn"</span></span>
-<span id="cb72-3"><a href="#cb72-3" aria-hidden="true" tabindex="-1"></a>net <span class="ot">=</span> <span class="fu">as_learner</span>(cnn <span class="sc">%&gt;&gt;%</span> head <span class="sc">%&gt;&gt;%</span> model)</span>
-<span id="cb72-4"><a href="#cb72-4" aria-hidden="true" tabindex="-1"></a>net<span class="sc">$</span>id <span class="ot">=</span> <span class="st">"net"</span></span>
-<span id="cb72-5"><a href="#cb72-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb72-6"><a href="#cb72-6" aria-hidden="true" tabindex="-1"></a>cifar10 <span class="ot">=</span> <span class="fu">tsk</span>(<span class="st">"cifar10"</span>)</span>
-<span id="cb72-7"><a href="#cb72-7" aria-hidden="true" tabindex="-1"></a>resampling <span class="ot">=</span> <span class="fu">rsmp</span>(<span class="st">"holdout"</span>)<span class="sc">$</span><span class="fu">instantiate</span>(cifar10)</span>
-<span id="cb72-8"><a href="#cb72-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb72-9"><a href="#cb72-9" aria-hidden="true" tabindex="-1"></a>design <span class="ot">=</span> <span class="fu">benchmark_grid</span>(</span>
-<span id="cb72-10"><a href="#cb72-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">task =</span> cifar10,</span>
-<span id="cb72-11"><a href="#cb72-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">learner =</span> <span class="fu">list</span>(net_bn, net),</span>
-<span id="cb72-12"><a href="#cb72-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">resampling =</span> resampling</span>
-<span id="cb72-13"><a href="#cb72-13" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb72-14"><a href="#cb72-14" aria-hidden="true" tabindex="-1"></a>design</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>net_bn <span class="ot">=</span> <span class="fu">as_learner</span>(cnn_bn <span class="sc">%&gt;&gt;%</span> head <span class="sc">%&gt;&gt;%</span> model)</span>
+<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>net_bn<span class="sc">$</span>id <span class="ot">=</span> <span class="st">"net_bn"</span></span>
+<span id="cb70-3"><a href="#cb70-3" aria-hidden="true" tabindex="-1"></a>net <span class="ot">=</span> <span class="fu">as_learner</span>(cnn <span class="sc">%&gt;&gt;%</span> head <span class="sc">%&gt;&gt;%</span> model)</span>
+<span id="cb70-4"><a href="#cb70-4" aria-hidden="true" tabindex="-1"></a>net<span class="sc">$</span>id <span class="ot">=</span> <span class="st">"net"</span></span>
+<span id="cb70-5"><a href="#cb70-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb70-6"><a href="#cb70-6" aria-hidden="true" tabindex="-1"></a>cifar10 <span class="ot">=</span> <span class="fu">tsk</span>(<span class="st">"cifar10"</span>)</span>
+<span id="cb70-7"><a href="#cb70-7" aria-hidden="true" tabindex="-1"></a>resampling <span class="ot">=</span> <span class="fu">rsmp</span>(<span class="st">"holdout"</span>)<span class="sc">$</span><span class="fu">instantiate</span>(cifar10)</span>
+<span id="cb70-8"><a href="#cb70-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb70-9"><a href="#cb70-9" aria-hidden="true" tabindex="-1"></a>design <span class="ot">=</span> <span class="fu">benchmark_grid</span>(</span>
+<span id="cb70-10"><a href="#cb70-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">task =</span> cifar10,</span>
+<span id="cb70-11"><a href="#cb70-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">learner =</span> <span class="fu">list</span>(net_bn, net),</span>
+<span id="cb70-12"><a href="#cb70-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">resampling =</span> resampling</span>
+<span id="cb70-13"><a href="#cb70-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb70-14"><a href="#cb70-14" aria-hidden="true" tabindex="-1"></a>design</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>      task learner resampling
     &lt;char&gt;  &lt;char&gt;     &lt;char&gt;
@@ -1048,19 +1043,24 @@ The first statement is true, because in evaluation mode, the module uses the run
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a>bmr <span class="ot">=</span> <span class="fu">benchmark</span>(design)</span>
-<span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a>bmr<span class="sc">$</span><span class="fu">aggregate</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a>bmr <span class="ot">=</span> <span class="fu">benchmark</span>(design)</span>
+<span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a>bmr<span class="sc">$</span><span class="fu">aggregate</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
 <section id="dropout" class="level2">
 <h2 class="anchored" data-anchor-id="dropout">Dropout</h2>
 <p>Dropout is a regularization technique used to prevent overfitting in neural networks by randomly setting a fraction of input units to zero during training. This encourages the network to learn more robust features that are not reliant on specific neurons, thereby improving its generalization capabilities. During each training iteration, dropout randomly “drops” a subset of neurons by setting their activations to zero with a specified probability (commonly between 20% to 50%). This forces the network to distribute the learned representations more evenly across neurons, reducing the reliance on any single neuron and mitigating overfitting. Dropout is more commonly used in the context of fully connected layers.</p>
-<p><img src="assets/dropout.png" class="img-fluid quarto-figure quarto-figure-center" style="width:100.0%"> Source: https://medium.com/konvergen/understanding-dropout-ddb60c9f98aa</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="assets/dropout.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%"></p>
+</figure>
+</div>
+<p>Source: https://medium.com/konvergen/understanding-dropout-ddb60c9f98aa</p>
 <p>Just like batch normalization, it also has different behavior during training and evaluation.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>dropout <span class="ot">=</span> <span class="fu">nn_dropout</span>(<span class="at">p =</span> <span class="fl">0.5</span>)</span>
-<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dropout</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a>dropout <span class="ot">=</span> <span class="fu">nn_dropout</span>(<span class="at">p =</span> <span class="fl">0.5</span>)</span>
+<span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dropout</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>torch_tensor
  0.0000 -3.9488  0.0093  0.0000  0.7024
@@ -1075,8 +1075,8 @@ The first statement is true, because in evaluation mode, the module uses the run
 -0.0000  0.0000  0.0000 -0.0000  1.5217
 [ CPUFloatType{10,5} ]</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>dropout<span class="sc">$</span><span class="fu">eval</span>()</span>
-<span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dropout</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>dropout<span class="sc">$</span><span class="fu">eval</span>()</span>
+<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dropout</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>torch_tensor
  0.9281 -1.9744  0.0046  1.7829  0.3512
@@ -1094,28 +1094,28 @@ The first statement is true, because in evaluation mode, the module uses the run
 </div>
 <p>To look at the effects, we will create a second classification head with dropout and then define new learners</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a>head_dropout <span class="ot">=</span> <span class="fu">po</span>(<span class="st">"nn_flatten"</span>) <span class="sc">%&gt;&gt;%</span></span>
-<span id="cb79-2"><a href="#cb79-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_linear"</span>, <span class="at">out_features =</span> <span class="dv">128</span>) <span class="sc">%&gt;&gt;%</span></span>
-<span id="cb79-3"><a href="#cb79-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_relu"</span>) <span class="sc">%&gt;&gt;%</span></span>
-<span id="cb79-4"><a href="#cb79-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_dropout"</span>, <span class="at">p =</span> <span class="fl">0.5</span>) <span class="sc">%&gt;&gt;%</span></span>
-<span id="cb79-5"><a href="#cb79-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_head"</span>)</span>
-<span id="cb79-6"><a href="#cb79-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb79-7"><a href="#cb79-7" aria-hidden="true" tabindex="-1"></a>net_bn_dropout <span class="ot">=</span> <span class="fu">as_learner</span>(cnn_bn <span class="sc">%&gt;&gt;%</span> head_dropout <span class="sc">%&gt;&gt;%</span> model)</span>
-<span id="cb79-8"><a href="#cb79-8" aria-hidden="true" tabindex="-1"></a>net_bn_dropout<span class="sc">$</span>id <span class="ot">=</span> <span class="st">"net_bn_dropout"</span></span>
-<span id="cb79-9"><a href="#cb79-9" aria-hidden="true" tabindex="-1"></a>net_dropout <span class="ot">=</span> <span class="fu">as_learner</span>(cnn <span class="sc">%&gt;&gt;%</span> head_dropout <span class="sc">%&gt;&gt;%</span> model)</span>
-<span id="cb79-10"><a href="#cb79-10" aria-hidden="true" tabindex="-1"></a>net_dropout<span class="sc">$</span>id <span class="ot">=</span> <span class="st">"net_dropout"</span></span>
-<span id="cb79-11"><a href="#cb79-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb79-12"><a href="#cb79-12" aria-hidden="true" tabindex="-1"></a>design2 <span class="ot">=</span> <span class="fu">benchmark_grid</span>(</span>
-<span id="cb79-13"><a href="#cb79-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">task =</span> cifar10,</span>
-<span id="cb79-14"><a href="#cb79-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">learner =</span> <span class="fu">list</span>(net_bn_dropout, net_dropout),</span>
-<span id="cb79-15"><a href="#cb79-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">resampling =</span> resampling</span>
-<span id="cb79-16"><a href="#cb79-16" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>head_dropout <span class="ot">=</span> <span class="fu">po</span>(<span class="st">"nn_flatten"</span>) <span class="sc">%&gt;&gt;%</span></span>
+<span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_linear"</span>, <span class="at">out_features =</span> <span class="dv">128</span>) <span class="sc">%&gt;&gt;%</span></span>
+<span id="cb77-3"><a href="#cb77-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_relu"</span>) <span class="sc">%&gt;&gt;%</span></span>
+<span id="cb77-4"><a href="#cb77-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_dropout"</span>, <span class="at">p =</span> <span class="fl">0.5</span>) <span class="sc">%&gt;&gt;%</span></span>
+<span id="cb77-5"><a href="#cb77-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"nn_head"</span>)</span>
+<span id="cb77-6"><a href="#cb77-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb77-7"><a href="#cb77-7" aria-hidden="true" tabindex="-1"></a>net_bn_dropout <span class="ot">=</span> <span class="fu">as_learner</span>(cnn_bn <span class="sc">%&gt;&gt;%</span> head_dropout <span class="sc">%&gt;&gt;%</span> model)</span>
+<span id="cb77-8"><a href="#cb77-8" aria-hidden="true" tabindex="-1"></a>net_bn_dropout<span class="sc">$</span>id <span class="ot">=</span> <span class="st">"net_bn_dropout"</span></span>
+<span id="cb77-9"><a href="#cb77-9" aria-hidden="true" tabindex="-1"></a>net_dropout <span class="ot">=</span> <span class="fu">as_learner</span>(cnn <span class="sc">%&gt;&gt;%</span> head_dropout <span class="sc">%&gt;&gt;%</span> model)</span>
+<span id="cb77-10"><a href="#cb77-10" aria-hidden="true" tabindex="-1"></a>net_dropout<span class="sc">$</span>id <span class="ot">=</span> <span class="st">"net_dropout"</span></span>
+<span id="cb77-11"><a href="#cb77-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb77-12"><a href="#cb77-12" aria-hidden="true" tabindex="-1"></a>design2 <span class="ot">=</span> <span class="fu">benchmark_grid</span>(</span>
+<span id="cb77-13"><a href="#cb77-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">task =</span> cifar10,</span>
+<span id="cb77-14"><a href="#cb77-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">learner =</span> <span class="fu">list</span>(net_bn_dropout, net_dropout),</span>
+<span id="cb77-15"><a href="#cb77-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">resampling =</span> resampling</span>
+<span id="cb77-16"><a href="#cb77-16" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Next, we run the second benchmark experiment and afterwards combine the results with the first benchmark experiment.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a>bmr2 <span class="ot">=</span> <span class="fu">benchmark</span>(design2)</span>
-<span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a>bmr <span class="ot">=</span> <span class="fu">c</span>(bmr, bmr2)</span>
-<span id="cb80-3"><a href="#cb80-3" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(bmr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a>bmr2 <span class="ot">=</span> <span class="fu">benchmark</span>(design2)</span>
+<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a>bmr <span class="ot">=</span> <span class="fu">c</span>(bmr, bmr2)</span>
+<span id="cb78-3"><a href="#cb78-3" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(bmr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -1148,33 +1148,34 @@ Not necessarily, as dropout is a regularization technique that prevents overfitt
 </ol>
 <p>When the model is then trained on a new task, only the last layer is replaced with a new output layer to adjust for the new task.</p>
 <p>This is visualized below:</p>
-<p><img src="assets/transfer-learning.svg" class="img-fluid"> Source: https://en.wikipedia.org/wiki/Transfer_learning</p>
+<p><img src="assets/transfer-learning.svg" class="img-fluid"></p>
+<p>Source: https://en.wikipedia.org/wiki/Transfer_learning</p>
 <p><code>mlr3torch</code> connects various pretrained image networks that are available in the <a href="https://torchvision.mlverse.org/"><code>torchvision</code> package</a>. The ResNet-18 model is a popular pre-trained model that was pretrained on ImageNet. We can use the pretrained weights by setting the <code>pretrained</code> parameter to <code>TRUE</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a>resnet <span class="ot">=</span> <span class="fu">lrn</span>(<span class="st">"classif.resnet18"</span>,</span>
-<span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">pretrained =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb81-3"><a href="#cb81-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">epochs =</span> <span class="dv">2</span>,</span>
-<span id="cb81-4"><a href="#cb81-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">batch_size =</span> <span class="dv">256</span>,</span>
-<span id="cb81-5"><a href="#cb81-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">validate =</span> <span class="fl">0.3</span>,</span>
-<span id="cb81-6"><a href="#cb81-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">measures_valid =</span> <span class="fu">msr</span>(<span class="st">"classif.logloss"</span>),</span>
-<span id="cb81-7"><a href="#cb81-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">device =</span> <span class="st">"cuda"</span>,</span>
-<span id="cb81-8"><a href="#cb81-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">predict_type =</span> <span class="st">"prob"</span>,</span>
-<span id="cb81-9"><a href="#cb81-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">id =</span> <span class="st">"pretrained"</span></span>
-<span id="cb81-10"><a href="#cb81-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb81-11"><a href="#cb81-11" aria-hidden="true" tabindex="-1"></a>resnet_no_pretrain <span class="ot">=</span> resnet<span class="sc">$</span><span class="fu">clone</span>(<span class="at">deep =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb81-12"><a href="#cb81-12" aria-hidden="true" tabindex="-1"></a>resnet_no_pretrain<span class="sc">$</span>param_set<span class="sc">$</span><span class="fu">set_values</span>(</span>
-<span id="cb81-13"><a href="#cb81-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">pretrained =</span> <span class="cn">FALSE</span></span>
-<span id="cb81-14"><a href="#cb81-14" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb81-15"><a href="#cb81-15" aria-hidden="true" tabindex="-1"></a>resnet_no_pretrain<span class="sc">$</span>id <span class="ot">=</span> <span class="st">"not_pretrained"</span></span>
-<span id="cb81-16"><a href="#cb81-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb81-17"><a href="#cb81-17" aria-hidden="true" tabindex="-1"></a>grid <span class="ot">=</span> <span class="fu">benchmark_grid</span>(</span>
-<span id="cb81-18"><a href="#cb81-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">task =</span> <span class="fu">tsk</span>(<span class="st">"cifar10"</span>),</span>
-<span id="cb81-19"><a href="#cb81-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">learner =</span> <span class="fu">list</span>(resnet, resnet_no_pretrain),</span>
-<span id="cb81-20"><a href="#cb81-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">resampling =</span> <span class="fu">rsmp</span>(<span class="st">"insample"</span>)</span>
-<span id="cb81-21"><a href="#cb81-21" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb81-22"><a href="#cb81-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb81-23"><a href="#cb81-23" aria-hidden="true" tabindex="-1"></a>bmr <span class="ot">=</span> <span class="fu">benchmark</span>(grid, <span class="at">store_models =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb81-24"><a href="#cb81-24" aria-hidden="true" tabindex="-1"></a>bmr<span class="sc">$</span><span class="fu">aggregate</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a>resnet <span class="ot">=</span> <span class="fu">lrn</span>(<span class="st">"classif.resnet18"</span>,</span>
+<span id="cb79-2"><a href="#cb79-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">pretrained =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb79-3"><a href="#cb79-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">epochs =</span> <span class="dv">2</span>,</span>
+<span id="cb79-4"><a href="#cb79-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">batch_size =</span> <span class="dv">256</span>,</span>
+<span id="cb79-5"><a href="#cb79-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">validate =</span> <span class="fl">0.3</span>,</span>
+<span id="cb79-6"><a href="#cb79-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">measures_valid =</span> <span class="fu">msr</span>(<span class="st">"classif.logloss"</span>),</span>
+<span id="cb79-7"><a href="#cb79-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">device =</span> <span class="st">"cuda"</span>,</span>
+<span id="cb79-8"><a href="#cb79-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">predict_type =</span> <span class="st">"prob"</span>,</span>
+<span id="cb79-9"><a href="#cb79-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">id =</span> <span class="st">"pretrained"</span></span>
+<span id="cb79-10"><a href="#cb79-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb79-11"><a href="#cb79-11" aria-hidden="true" tabindex="-1"></a>resnet_no_pretrain <span class="ot">=</span> resnet<span class="sc">$</span><span class="fu">clone</span>(<span class="at">deep =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb79-12"><a href="#cb79-12" aria-hidden="true" tabindex="-1"></a>resnet_no_pretrain<span class="sc">$</span>param_set<span class="sc">$</span><span class="fu">set_values</span>(</span>
+<span id="cb79-13"><a href="#cb79-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">pretrained =</span> <span class="cn">FALSE</span></span>
+<span id="cb79-14"><a href="#cb79-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb79-15"><a href="#cb79-15" aria-hidden="true" tabindex="-1"></a>resnet_no_pretrain<span class="sc">$</span>id <span class="ot">=</span> <span class="st">"not_pretrained"</span></span>
+<span id="cb79-16"><a href="#cb79-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb79-17"><a href="#cb79-17" aria-hidden="true" tabindex="-1"></a>grid <span class="ot">=</span> <span class="fu">benchmark_grid</span>(</span>
+<span id="cb79-18"><a href="#cb79-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">task =</span> <span class="fu">tsk</span>(<span class="st">"cifar10"</span>),</span>
+<span id="cb79-19"><a href="#cb79-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">learner =</span> <span class="fu">list</span>(resnet, resnet_no_pretrain),</span>
+<span id="cb79-20"><a href="#cb79-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">resampling =</span> <span class="fu">rsmp</span>(<span class="st">"insample"</span>)</span>
+<span id="cb79-21"><a href="#cb79-21" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb79-22"><a href="#cb79-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb79-23"><a href="#cb79-23" aria-hidden="true" tabindex="-1"></a>bmr <span class="ot">=</span> <span class="fu">benchmark</span>(grid, <span class="at">store_models =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb79-24"><a href="#cb79-24" aria-hidden="true" tabindex="-1"></a>bmr<span class="sc">$</span><span class="fu">aggregate</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>When fine-tuning a pretrained model like ResNet-18, it’s common to observe instabilities in gradients, which can manifest as fluctuating validation performance. This can e.g.&nbsp;be because the learning rate is too high (compared to the learning rate that was used during pretraining).</p>
 <p>To address this, one can:</p>
@@ -1196,8 +1197,9 @@ In-Context Learning
 <p>Large foundation models (such as GPT-4) even allow to perform tasks on which they were not pretrained on without any finetuning. This is referred to as in-context learning or zero-shot learning. There, the task is fed into the model during inference: “Hey ChatGPT, is What is the sentiment of this sentence. Return -1 for sad, 0 for neutral, 1 for happy: <sentence>”</sentence></p>
 </div>
 </div>
-<section id="data-augmentation" class="level3">
-<h3 class="anchored" data-anchor-id="data-augmentation">Data Augmentation</h3>
+</section>
+<section id="data-augmentation" class="level2">
+<h2 class="anchored" data-anchor-id="data-augmentation">Data Augmentation</h2>
 <p>Data augmentation is a technique used to increase the diversity and quantity of training data without actually collecting new data. By applying various transformations to the existing dataset, data augmentation helps improve the generalization capabilities of machine learning models, reduce overfitting, and enhance model robustness. This is especially crucial when you have limited data.</p>
 <p>Data augmentation for images can consist of rotation, flipping, translating, grey scaling, etc. Which data augmentation is admissible, depends on the task:</p>
 <ul>
@@ -1207,15 +1209,15 @@ In-Context Learning
 <p>In other words, the data augmentation must be compatible with the invariances of the task.</p>
 <p>In <code>mlr3torch</code>, data augmentation is available via <code>PipeOp</code>s of the form <code>po("augment_")</code>. Currently, only augemntation operators from the <code>torchvision</code> package are available, but you can also add your own.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a>augment <span class="ot">=</span> <span class="fu">po</span>(<span class="st">"augment_random_resized_crop"</span>) <span class="sc">%&gt;&gt;%</span></span>
-<span id="cb82-2"><a href="#cb82-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"augment_random_horizontal_flip"</span>) <span class="sc">%&gt;&gt;%</span></span>
-<span id="cb82-3"><a href="#cb82-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"augment_random_vertical_flip"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a>augment <span class="ot">=</span> <span class="fu">po</span>(<span class="st">"augment_random_resized_crop"</span>) <span class="sc">%&gt;&gt;%</span></span>
+<span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"augment_random_horizontal_flip"</span>) <span class="sc">%&gt;&gt;%</span></span>
+<span id="cb80-3"><a href="#cb80-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">po</span>(<span class="st">"augment_random_vertical_flip"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We can just create a new <code>GraphLearner</code> that includes the augemntation steps as well as the learner from above:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a>resnet_augmented <span class="ot">=</span> <span class="fu">as_learner</span>(augment <span class="sc">%&gt;&gt;%</span> resnet)</span>
-<span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a>resnet_augmented<span class="sc">$</span>id <span class="ot">=</span> <span class="st">"resnet_augmented"</span></span>
-<span id="cb83-3"><a href="#cb83-3" aria-hidden="true" tabindex="-1"></a>resnet_augmented<span class="sc">$</span><span class="fu">train</span>(<span class="at">task =</span> cifar10)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a>resnet_augmented <span class="ot">=</span> <span class="fu">as_learner</span>(augment <span class="sc">%&gt;&gt;%</span> resnet)</span>
+<span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a>resnet_augmented<span class="sc">$</span>id <span class="ot">=</span> <span class="st">"resnet_augmented"</span></span>
+<span id="cb81-3"><a href="#cb81-3" aria-hidden="true" tabindex="-1"></a>resnet_augmented<span class="sc">$</span><span class="fu">train</span>(<span class="at">task =</span> cifar10)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -1232,11 +1234,10 @@ Quiz: Data Augmentation
 <summary>
 Click for answer
 </summary>
-Usually not, as the purpose of data augmentation is not to improve an individual prediction, it will not be applied during test time and hence also not to the validation set. Looking at the performance of augmented validation data is, however, also not a mistake.
+No, as the purpose of data augmentation is not to improve an individual prediction, it will not be applied during test time and hence also not to the validation set. Looking at the performance of augmented validation data is, however, also not a mistake.
 </details>
 </div>
 </div>
-</section>
 </section>
 </section>
 <section id="exercises" class="level1">

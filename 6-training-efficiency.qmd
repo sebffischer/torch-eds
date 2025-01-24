@@ -696,7 +696,7 @@ bn(x[1:10, ])
 ```
 
 
-Which of the following statements (stored in vairiables `equal1` and `equal2`) do you think is true?
+Which of the following statements is true and why?
 
 ```{r}
 bn$eval()
@@ -711,13 +711,10 @@ equal2 = torch_equal(
 )
 ```
 
-Is the following statement true?
-
 <details>
 <summary>Click for answer</summary>
 ```{r}
-equal1
-equal2
+c(equal1, equal2)
 ```
 
 The first statement is true, because in evaluation mode, the module uses the running mean and variance of all training samples seen.
@@ -800,6 +797,7 @@ During each training iteration, dropout randomly "drops" a subset of neurons by 
 Dropout is more commonly used in the context of fully connected layers.
 
 ![](assets/dropout.png){fig-align="center" width=100%}
+
 Source: https://medium.com/konvergen/understanding-dropout-ddb60c9f98aa
 
 Just like batch normalization, it also has different behavior during training and evaluation.
@@ -869,6 +867,7 @@ When the model is then trained on a new task, only the last layer is replaced wi
 This is visualized below:
 
 ![](assets/transfer-learning.svg)
+
 Source: https://en.wikipedia.org/wiki/Transfer_learning
 
 `mlr3torch` connects various pretrained image networks that are available in the [`torchvision` package](https://torchvision.mlverse.org/).
@@ -923,7 +922,7 @@ This is referred to as in-context learning or zero-shot learning.
 There, the task is fed into the model during inference: "Hey ChatGPT, is What is the sentiment of this sentence. Return -1 for sad, 0 for neutral, 1 for happy: <sentence>"
 :::
 
-### Data Augmentation
+## Data Augmentation
 
 Data augmentation is a technique used to increase the diversity and quantity of training data without actually collecting new data.
 By applying various transformations to the existing dataset, data augmentation helps improve the generalization capabilities of machine learning models, reduce overfitting, and enhance model robustness.
@@ -961,7 +960,7 @@ resnet_augmented$train(task = cifar10)
 
 <details>
 <summary>Click for answer</summary>
-Usually not, as the purpose of data augmentation is not to improve an individual prediction, it will not be applied during test time and hence also not to the validation set.
+No, as the purpose of data augmentation is not to improve an individual prediction, it will not be applied during test time and hence also not to the validation set.
 Looking at the performance of augmented validation data is, however, also not a mistake.
 </details>
 :::

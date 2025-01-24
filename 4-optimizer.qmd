@@ -221,26 +221,6 @@ This formula shows that the weight decay term ($- \lambda \theta_t$) effectively
 
 ![](assets/regularization.png)
 
-::: {.callout-note}
-**Bias-Variance Tradeoff in Classical Statistics**
-
-In classical statistics and machine learning, the bias-variance tradeoff is a fundamental concept that describes the balance between two sources of error when building predictive models:
-
-- Bias: This refers to the error introduced by approximating a real-world problem, which may be complex, by a simplified model (e.g. a highly non-linear problem with a linear model).
-
-- Variance: This refers to the model's sensitivity to fluctuations in the training data. Complex models with many parameters typically exhibit high variance.
-
-The tradeoff implies that reducing bias increases variance and vice versa. The goal is to find an optimal balance where both bias and variance are minimized to achieve good generalization performance on unseen data.
-
-![](assets/bias_variance.png)
-
-Source: https://en.wikipedia.org/wiki/Bias%E2%80%93variance_tradeoff
-
-However, modern neural networks are heavily overparameterized, can fit the training data perfectly, thus have zero bias, but still generalize well to unseen data.
-Part of the explanation were the aforementioned implicit regularization effects of SGD.
-For more information on why deep neural networks tend to generalize well, see @zhang2021understanding.
-:::
-
 ## Momentum
 
 Momentum is a technique that helps accelerate gradient descent by using an exponential moving average of past gradients. Like a ball rolling down a hill, momentum helps the optimizer:
