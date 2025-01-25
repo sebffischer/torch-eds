@@ -484,7 +484,7 @@ We can access the dataset via the `torchvision` package.
 For simplicity, we will only load the training data.
 
 ```{r}
-cifar10_original = torchvision::cifar10_dataset(root = "cifar10", train = TRUE, download = TRUE)
+cifar10_original = torchvision::cifar10_dataset(root = "data/cifar10", train = TRUE, download = TRUE)
 image_array = cifar10_original$x
 str(image_array)
 ```
