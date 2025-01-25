@@ -1,0 +1,6 @@
+---
+title: "Modules and Data Exercises"
+---
+
+
+1. Model a sinus function (And then also learn what happens when you extrapolate beyond the training distribution)
