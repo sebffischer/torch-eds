@@ -1,5 +1,6 @@
-cifar10
-data_cache
 .DS_Store
 renv/library
-*_files
+notebooks/*_files
+notebooks/*.html/
+data/*
+Rplots.pdf
