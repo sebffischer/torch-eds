@@ -9,34 +9,34 @@ torch::torch_manual_seed(123)
 
 # From Linear Models to Neural Networks
 
-In the previous notebook, we learned how to use Torch's autograd system to fit simple linear models. We manually:
+In the previous notebook, we explored how to use `torch`'s autograd system to fit simple linear models. We manually:
 
 1. Managed the weights.
 2. Defined the forward path for the model.
 3. Computed gradients and updated parameters using a simple update rule: `a$sub_(lr * a$grad)`
 
-For more complex models, this approach becomes unwieldy. `torch` provides several high-level abstractions that make it easier to build and train neural networks:
+For more complex models, this approach becomes cumbersome. `torch` offers several high-level abstractions that simplify building and training neural networks:
 
-* `nn_module`: A class to organize model parameters and define the forward pass.
-* `dataset` and `dataloader`: Classes to handle data loading and batching (replacing our manual data handling).
-* `optim`: Classes that implement various optimization algorithms (replacing our manual gradient updates).
+- `nn_module`: A class to organize model parameters and define the forward pass.
+- `dataset` and `dataloader`: Classes to handle data loading and batching, replacing our manual data handling.
+- `optim`: Classes that implement various optimization algorithms, replacing our manual gradient updates.
 
-Let's see how these components work together by building a neural network to classify spiral data. Note that we will only briefly cover optimizers here and dedicate an extra notebook to them.
+Let's explore how these components work together by building a neural network to classify spiral data. Note that we only briefly touch on optimizers here and dedicate an additional notebook to them.
 
 # Neural Network Architecture with `nn_module`
 
 The `nn_module` class serves several purposes:
 
 1. Acts as a container for learnable parameters.
-2. Provides train/eval modes (important for layers like dropout and batch normalization).
+2. Provides train/eval modes, which are essential for layers like dropout and batch normalization.
 3. Defines the forward pass of the model.
 
-Torch provides many common neural network modules out of the box. For example, the simple linear model we created earlier ($\hat{y} = ax + b$) can be created using the built-in `nn_linear` module:
+Torch offers many common neural network modules out of the box. For example, the simple linear model we created earlier ($\hat{y} = ax + b$) can be constructed using the built-in `nn_linear` module:
 
 ```{r}
 library(torch)
 linear_model <- nn_linear(in_features = 1, out_features = 1, bias = TRUE)
-print(linear_model$parameters)
+linear_model$parameters
 ```
 
 We can perform a forward pass by simply calling the function on some inputs.
@@ -45,18 +45,17 @@ We can perform a forward pass by simply calling the function on some inputs.
 linear_model(torch_randn(1))
 ```
 
-Note that while `nn_module`s act like functions, they also have a *state*, most importantly their parameter weights.
+Note that while `nn_module`s behave like functions, they also maintain a *state*, primarily their parameter weights.
 
-It is straightforward to implement a custom `nn_module`, which requires implementing two key methods:
+Implementing a custom `nn_module` is straightforward and requires defining two key methods:
 
-1. `initialize`: This method is the constructor that runs when the model is created. It defines the layers and their dimensions.
+1. `initialize`: This constructor runs when the model is created. It defines the layers and their dimensions.
+2. `forward`: This method defines how data flows through your network: it specifies the actual computation path from input to output.
 
-2. `forward`: This method defines how data flows through your network - it specifies the actual computation path from input to output.
-
-We can implement a simple linear regression module ourselves.
+Let's implement a simple linear regression module ourselves.
 
 ```{r}
-nn_simple_linear = nn_module("nn_simple_linear",
+nn_simple_linear <- nn_module("nn_simple_linear",
   initialize = function() {
     # `self` refers to the object itself
     self$a = nn_parameter(torch_randn(1), requires_grad = TRUE)
@@ -68,10 +67,10 @@ nn_simple_linear = nn_module("nn_simple_linear",
 )
 ```
 
-Note that `nn_simple_linear` is not an `nn_module` itself, but an `nn_module_generator`. To create the `nn_module`, we call it, which invokes the `$initialize()` method defined above:
+Note that `nn_simple_linear` is not an `nn_module` itself but an `nn_module_generator`. To create the `nn_module`, we call it, which invokes the `$initialize()` method defined above:
 
 ```{r}
-simple_linear = nn_simple_linear()
+simple_linear <- nn_simple_linear()
 simple_linear
 simple_linear$parameters
 ```
@@ -84,7 +83,7 @@ simple_linear$parameters
 
 Besides parameters, neural networks can also have **buffers** (`nn_buffer`). Buffers are tensors that are part of the model's state but don't receive gradients during backpropagation.
 
-Besides the parameters and buffers, an `nn_module` operates in either a *train* or *eval* state:
+Additionally, an `nn_module` operates in either a *train* or *eval* state:
 
 ```{r}
 simple_linear$train()
@@ -114,7 +113,7 @@ simple_linear$state_dict()
 The state dict can, for example, be used to save the network's weights for later use. Note that, in general, you cannot simply save and load `torch` objects using `saveRDS` and `readRDS`:
 
 ```{r, error = TRUE}
-pth = tempfile()
+pth <- tempfile()
 saveRDS(simple_linear$state_dict(), pth)
 readRDS(pth)
 ```
@@ -188,7 +187,7 @@ CNNs encode several strong inductive biases about visual data:
 
 These biases make CNNs particularly effective for image-related tasks because they align with our understanding of how visual information is structured.
 
-To create a convolutional layer for a 2d image, we can use the `nn_conv2d` function.
+To create a convolutional layer for a 2D image, we can use the `nn_conv2d` function.
 
 ```{r, include = FALSE}
 library(mlr3torch)
@@ -227,24 +226,21 @@ conv_layer <- nn_conv2d(in_channels = 1, out_channels = 1, kernel_size = 3, padd
 str(conv_layer(image))
 ```
 
-Because we have encoded more information about the structural relationship between the input tensor and the output tensor (the same filter is applied to the entire image), the convolutional layer has much less parameters than a fully connected layer.
+Because we have encoded more information about the structural relationship between the input tensor and the output tensor (the same filter is applied to the entire image), the convolutional layer has far fewer parameters than a fully connected layer.
 
 ```{r}
 conv_layer$parameters
 ```
 
-:::{.callout-note}
-## Weights of a fully connected layer
+::: {.callout-note}
+## Weights of a Fully Connected Layer
 
 **Question 1**: How many parameters does a fully connected layer with the same number of inputs and outputs have?
 
 <details>
 <summary>Answer</summary>
 
-The input has 28 x 28 = 784 pixels and the output as well.
-The weights of the fully connected layer are a 784 x 784 matrix, so the number of parameters is 784 x 784 = 614656.
-
-
+The input has $28 \times 28 = 784$ pixels and the output as well. The weights of the fully connected layer are a $784 \times 784$ matrix and the bias also has 784 elements, so the number of parameters is $784 \times 784 + 784 = 615440$, much more than our simple convolutional kernel.
 
 </details>
 
@@ -259,7 +255,6 @@ image_rgb2 <- conv_layer_pretrained(image_rgb)
 ps <- lapply(1:25, function(i) plot_2d_image(image_rgb2[i, ..]))
 cowplot::plot_grid(plotlist = ps, nrow = 5)
 ```
-
 
 ### Transformers
 
@@ -276,8 +271,7 @@ Transformer architectures, which power language models like GPT-4 and are common
 
 These biases make Transformers well-suited for tasks where long-range dependencies are important, such as understanding language or analyzing sequences.
 
-In `torch`, the `nn_multihead_attention` module implements the attention mechanism.
-We demonstrate how to use it using random data, a single output head and self-attention for simplicity.
+In `torch`, the `nn_multihead_attention` module implements the attention mechanism. We demonstrate how to use it with random data, a single output head, and self-attention for simplicity.
 
 ```{r}
 library(torch)
@@ -298,7 +292,7 @@ attention <- nn_multihead_attention(
 # Create random input embedding
 input_embedding <- torch_randn(seq_length, batch_size, embed_dim)
 
-# For self-attention, the query, key and value are the same
+# For self-attention, the query, key, and value are the same
 query <- key <- value <- input_embedding
 
 # Forward pass, keep the attention weights, not only new embeddings
@@ -333,7 +327,7 @@ Below, we show a visualization of the mechanism:
 
 Source: https://data-science-blog.com/blog/2021/04/07/multi-head-attention-mechanism/
 
-### MLPs (like our spiral network)
+### MLPs (like our Spiral Network)
 
 The different layers in a Multi-Layer Perceptron (MLP) consist mainly of an affine-linear transformation followed by a non-linear function, such as a ReLU activation function:
 
@@ -387,7 +381,6 @@ The image below visualizes the general structure of this network:
 
 Source: https://tikz.net/neural_networks/
 
-
 We can create a concrete network by calling the resulting `nn_module_generator` and specifying the required parameters.
 
 ```{r}
@@ -412,7 +405,7 @@ $$ \text{softmax}(x) = \frac{\exp(x)}{\sum_i \exp(x_i)} $$
 In `torch`, we can apply the softmax function using `nnf_softmax()`, specifying the dimension along which to apply softmax.
 
 ```{r}
-logits = model(torch_randn(2, 2))
+logits <- model(torch_randn(2, 2))
 print(logits)
 # dim = 2 applies softmax along the class dimension (columns)
 nnf_softmax(logits, dim = 2)
@@ -537,10 +530,12 @@ For the spiral problem, we could have also used the `torch::tensor_dataset` clas
 Now that we have defined the dataset class generator, let's create training and validation datasets:
 
 Training and validation datasets serve different purposes:
+
 - **Training data** is used to update the model's parameters and learn patterns.
 - **Validation data** helps evaluate how well the model generalizes to unseen data, detect overfitting, and guide model selection decisions.
 
 Validation in deep learning is crucial for:
+
 1. **Detecting Overfitting**: If training loss decreases but validation loss increases, the model is likely overfitting to the training data.
 2. **Model Selection**: We can use validation performance to choose the best model architecture and hyperparameters.
 3. **Early Stopping**: We can halt training when validation performance stops improving to prevent overfitting.
@@ -549,7 +544,7 @@ The validation set acts as a proxy for unseen data, providing an estimate of how
 
 ```{r}
 # Split data into train and validation sets
-train_ids = sample(1:500, 400)
+train_ids <- sample(1:500, 400)
 train_data <- spiral_data[train_ids,]
 valid_data <- spiral_data[-train_ids,]
 
@@ -596,7 +591,7 @@ print(n_batches)
 It is also possible to manually iterate over the batches by first creating an iterator using `torch::dataloader_make_iter()` and then calling `dataloader_next()` until `NULL` is returned, indicating that the iterator is exhausted.
 
 ```{r}
-iter = dataloader_make_iter(train_loader)
+iter <- dataloader_make_iter(train_loader)
 n_batches <- 0
 while (!is.null(batch <<- dataloader_next(iter))) {
   n_batches <- n_batches + 1
@@ -606,16 +601,16 @@ print(n_batches)
 
 # Training Loop
 
-In order to train our MLP on the data, we need to specify how the gradients will update the network parameters, which is the role of the optimizer. While we'll cover more complex optimizers in the next section, we'll use a vanilla SGD optimizer with a learning rate of `0.3` and pass it the parameters of the model we wish to optimize.
+To train our MLP on the data, we need to specify how the gradients will update the network parameters, which is the role of the optimizer. While we'll cover more complex optimizers in the next section, we'll use a vanilla SGD optimizer with a learning rate of `0.3` and pass it the parameters of the model we wish to optimize.
 
 ```{r}
-optimizer = optim_sgd(model$parameters, lr = 0.3)
+optimizer <- optim_sgd(model$parameters, lr = 0.3)
 ```
 
 For the training loop, we only need methods from the optimizer class:
 
-* The `$step()` method updates the weights based on the gradients and the optimizer configuration (e.g., the learning rate).
-* The `$zero_grad()` method sets the gradients of all parameters handled by the optimizer to $0$.
+- The `$step()` method updates the weights based on the gradients and the optimizer configuration (e.g., the learning rate).
+- The `$zero_grad()` method sets the gradients of all parameters handled by the optimizer to 0.
 
 Now, let's put everything together:
 
@@ -628,7 +623,7 @@ device <- if (cuda_is_available()) "cuda" else "cpu"
 model$to(device = device)
 
 # Training loop
-history = list(loss = numeric(), train_acc = numeric(), valid_acc = numeric())
+history <- list(loss = numeric(), train_acc = numeric(), valid_acc = numeric())
 
 for(epoch in seq_len(n_epochs)) {
   model$train()  # Set to training mode
@@ -756,6 +751,3 @@ This example demonstrates how Torch's high-level components work together to bui
 - The `optimizer` handles parameter updates.
 - The `dataset` and `dataloader` classes work in tandem for data loading.
 - The training loop integrates everything seamlessly.
-
-
-

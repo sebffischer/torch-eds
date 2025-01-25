@@ -1,0 +1,14 @@
+---
+title: "Optimizer Exercises"
+---
+
+Rosenbrock function
+
+```{r}
+
+```
+
+1. Exploring t
+
+
+2. Learning rate schedulers

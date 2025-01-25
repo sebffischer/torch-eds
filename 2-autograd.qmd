@@ -2,12 +2,11 @@
 title: "Automatic Differentiation with torch"
 ---
 
-TODO:
-
 ```{r, include = FALSE}
 set.seed(123)
 torch::torch_manual_seed(123)
 ```
+
 
 # Overview
 
@@ -51,8 +50,8 @@ x <- torch_tensor(3)
 We can use the weights and input to perform a forward pass:
 
 ```{r}
-u = a * x
-y = u + b
+u <- a * x
+y <- u + b
 ```
 
 When you perform operations on tensors with gradient tracking, torch builds a computational graph on the fly. In the figure below:
@@ -244,8 +243,8 @@ We start by implementing a single gradient step. Note that if we repeatedly call
 ```{r}
 update_params <- function(X_batch, Y_batch, lr, a, b) {
   # Perform forward pass, calculate loss
-  Y_hat = X_batch * a + b
-  loss = mean((Y_hat - Y_batch)^2)
+  Y_hat <- X_batch * a + b
+  loss <- mean((Y_hat - Y_batch)^2)
 
   # Calculate gradients
   loss$backward()
@@ -281,8 +280,8 @@ batches <- split(sample(1:100), rep(seq_len(batch_size), length.out = 100))
 history <- list()
 for (epoch in seq_len(epochs)) {
   for (step in 1:10) {
-    result = update_params(X[batches[[step]]], Y[batches[[step]]], lr, a, b)
-    history = append(history, list(as.data.table(result)))
+    result <- update_params(X[batches[[step]]], Y[batches[[step]]], lr, a, b)
+    history <- append(history, list(as.data.table(result)))
   }
 }
 

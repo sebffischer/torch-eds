@@ -2,6 +2,11 @@
 title: "Torch Tensor Exercises"
 ---
 
+```{r, include = FALSE}
+set.seed(123)
+torch::torch_manual_seed(123)
+```
+
 :::{.callout-note}
 To solve these exercises, consulting the [function reference](https://torch.mlverse.org/docs/reference/) can be helpful.
 :::
@@ -12,7 +17,7 @@ Recreate this torch tensor:
 
 ```{r, echo = FALSE}
 library(torch)
-x = torch_tensor(matrix(1:6, byrow = TRUE, nrow = 2))
+x <- torch_tensor(matrix(1:6, byrow = TRUE, nrow = 2))
 x
 ```
 
@@ -30,7 +35,7 @@ How can you check programatically that you successfully created a view, and not 
 We start by creating the tensor:
 
 ```{r}
-x = torch_tensor(matrix(1:6, byrow = TRUE, nrow = 2))
+x <- torch_tensor(matrix(1:6, byrow = TRUE, nrow = 2))
 x
 ```
 

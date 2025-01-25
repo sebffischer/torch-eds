@@ -1,0 +1,13 @@
+---
+title: "Practical Use Case"
+---
+
+```{r, include = FALSE}
+set.seed(123)
+torch::torch_manual_seed(123)
+```
+
+In this notebook, the goal is to solve an actual problem using a neural network.
+As a baseline model, we will use a simple tree-based model.
+
+You are free to use either only `torch` or `mlr3torch`.

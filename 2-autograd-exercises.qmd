@@ -1,8 +1,11 @@
-
 ---
 title: "Autograd Exercises"
 ---
 
+```{r, include = FALSE}
+set.seed(123)
+torch::torch_manual_seed(123)
+```
 
 **Question 1**: Appreciating autograd
 
