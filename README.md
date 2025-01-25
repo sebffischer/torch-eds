@@ -21,7 +21,7 @@ It's [documentation](https://github.com/r-lib/rig?tab=readme-ov-file#id-installa
 
 After having installed `rig`, you can install R 4.4.2 and make it the default by running the following command in your terminal:
 
-```{bash, eval = FALSE}
+```bash
 rig add 4.4.2
 rig default 4.4.2
 ```
@@ -33,26 +33,26 @@ Verify that the R version is 4.4.2 by running `R --version` in your terminal.
 For managing libraries, we use the [`renv` package](https://rstudio.github.io/renv/articles/renv.html).
 If you don't have `renv` installed, you can install it by running the following command:
 
-```{r, eval = FALSE}
+```r
 install.packages("renv")
 ```
 
 Next, initialize the `renv` environment by running the following command:
 
-```{r, eval = FALSE}
+```r
 renv::init()
 ```
 
 Finally, restore the renv environment by running the following command.
 This might take some time as it downloads all the required libraries.
 
-```{r, eval = FALSE}
+```r
 renv::restore()
 ```
 
 To be able to use the `torch` package, you need to also run this additional command:
 
-```{r}
+```r
 torch::install_torch()
 ```
 
