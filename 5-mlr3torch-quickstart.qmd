@@ -241,6 +241,7 @@ at = auto_tuner(
 
 The `AutoTuner` can be used just like any other `Learner`.
 In order to get a valid performance estimte of the tuning process, we can `resample()` it on the task.
+This is called *nested resampling*: the outer resampling is for evaluation and the inner resampling is for tuning.
 
 ```{r}
 rr = resample(tsk_mtcars, at, rsmp_tune)

@@ -55,23 +55,6 @@ u = a * x
 y = u + b
 ```
 
-
-:::{.callout-note}
-## Requires Grad
-
-**Question 1**: Can you guess the value of `requires_grad` for `u`?
-
-
-<details>
-<summary>
-Because `x` requires gradient tracking, `u` and `y` will also require gradient tracking.
-Because of the chain rule, calculating the gradients of `g(f(x))` requires
-
-</summary>
-
-</details>
-:::
-
 When you perform operations on tensors with gradient tracking, torch builds a computational graph on the fly. In the figure below:
 
 * Blue tensors are those for which we want to calculate gradients.

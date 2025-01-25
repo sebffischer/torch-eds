@@ -3,9 +3,6 @@ title: "Building Neural Networks with torch"
 ---
 
 TODO:
-* need to talk more about loss functions, i.e. cross-entropy.
-
-* Add the start show how to implement a linear model from scratch maybe (with ReLU activation etc.).
 * Show some available modules like relu, convolutions, etc.
   Probably should build a CNN
 
@@ -190,7 +187,7 @@ Deep neural network often consist of many different layers (hence the name "deep
 Traditional machine learning and statistics relies on manual feature engineering to transform raw inputs, whereas deep neural networks revolutionized this process by automatically learning hierarchical features directly from the data.
 
 One challenging problem is how to define a neural network architecture for a given problem.
-While neural networks with a single hidden layer can theoretically approximate any continuous function (Kurt Hornik's Universal Approximation Theorem), the practical challenge lies in finding these solutions efficiently.
+While neural networks with a single hidden layer can theoretically approximate any continuous function, the practical challenge lies in finding these solutions efficiently.
 This is where architectural choices and their associated *inductive biases* become crucial.
 
 An inductive bias represents the set of assumptions that a learning algorithm uses to predict outputs given inputs that it has not encountered during training.
@@ -297,15 +294,107 @@ model <- nn_spiral_net(
 print(model)
 ```
 
-The model outputs logits (unnormalized probabilities) because when training a classification network with cross-entropy, using logits is more numerically stable.
-If we wanted to obtain class probabilities we would have to apply the softmax function:
+At this point, we also want to briefly talk about the output -- the 'head' of the network -- and loss functions.
+
+**Classification**
+
+The output dimension of a classification network is usually the number of classes, i.e. 2 in our case.
+What is output, however, is not probabilities, but logit scores
+To convert a vector of scores to probabilities, we apply the softmax function:
+
+$$ \text{softmax}(x) = \frac{\exp(x)}{\sum_i \exp(x_i)} $$
+
+In `torch`, we can apply the softmax function using `nnf_softmax()`, but need to specify the dimension along which to apply the softmax.
 
 ```{r}
-logits = model(torch_randn(1, 2))
+logits = model(torch_randn(2, 2))
 print(logits)
 # dim = 2 applies softmax along the class dimension (columns)
 nnf_softmax(logits, dim = 2)
 ```
+
+The loss function is most commonly cross-entropy.
+For a true probability vector $p$ and a predicted probability vector $q$, the cross-entropy is defined as:
+
+$$ \text{CE}(p, q) = - \sum_i p_i \log(q_i) $$
+
+Note that when the true probability $p$ is either $1$ for the true class or $0$ for all other classes, the cross-entropy can be simplified to:
+
+$$ \text{CE}(p, q) = - \log(q_{y}) $$
+
+where $y$ is the true class and $q_y$ its predicted probability.
+
+To calculate the cross-entropy loss, we need to pass the predicted scores and the true class indices to the loss function.
+The classes are expected to be labeled from `1` to `C` for a total of `C` classes.
+
+```{r}
+y_true <- torch_tensor(c(1, 2), dtype = torch_long())
+dim(logits)
+dim(y_true)
+nnf_cross_entropy(input = logits, target = y_true)
+```
+
+**Regression**
+
+For regression tasks, the final layer is almost always a simple linear layer with a single output.
+We can construct a version of the spiral network for regression by changing the final layer to a linear layer with a single output:
+
+```{r}
+model_regr <- nn_spiral_net(input_size = 2, hidden_size = 64, output_size = 1)
+x <- torch_randn(1, 2)
+y_hat <- model_regr(x)
+y <- torch_randn(1)
+```
+
+The loss function is usually the mean squared error, which is defined as:
+
+$$ \text{MSE}(y, \hat{y}) = \frac{1}{n} \sum_{i=1}^n (y_i - \hat{y}_i)^2 $$
+
+In `torch`, we can either apply the mean squared error loss using `nnf_mse_loss()`, or construct an mse module:
+
+```{r}
+mse <- nn_mse_loss()
+mse(y_hat, y)
+nnf_mse_loss(y_hat, y)
+```
+
+
+:::{.callout-note}
+Finally, we want to note that there is nothing 'magical' about `nn_module`s.
+We could have equally implemented the same network manually ourselves:
+
+```{r}
+make_weights <- function(input_size, hidden_size, output_size) {
+  list(
+    list(
+      w = torch_randn(input_size, hidden_size),
+      b = torch_randn(hidden_size)
+    ),
+    list(
+      w = torch_randn(hidden_size, hidden_size),
+      b = torch_randn(hidden_size)
+    ),
+    list(
+      w = torch_randn(hidden_size, hidden_size),
+      b = torch_randn(hidden_size)
+    ),
+    list(
+      w = torch_randn(hidden_size, output_size),
+      b = torch_randn(output_size)
+    )
+  )
+}
+
+forward <- function(input, weights) {
+  for (layer in weights) {
+    input <- nnf_relu(input$matmul(layer$w))
+  }
+  input
+}
+params <- make_weights(2, 64, 2)
+forward(x, params)
+```
+:::
 
 # Dataset and DataLoader
 

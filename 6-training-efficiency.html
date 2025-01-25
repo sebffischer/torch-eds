@@ -326,8 +326,8 @@ Click for answer
 <pre><code># A tibble: 2 × 6
   expression      min   median `itr/sec` mem_alloc `gc/sec`
   &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 disk        20.26ms   23.3ms      39.9   13.65MB    14.5 
-2 ram          9.39ms     12ms      55.9    9.39MB     9.32</code></pre>
+1 disk        17.98ms   20.2ms      48.0   13.65MB     13.7
+2 ram          8.99ms   11.9ms      74.5    9.39MB     16.0</code></pre>
 </div>
 </div>
 </details>
@@ -362,8 +362,8 @@ Click for answer
 <pre><code># A tibble: 2 × 6
   expression      min   median `itr/sec` mem_alloc `gc/sec`
   &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 tensor       4.73ms   6.52ms     137.    76.29KB     4.56
-2 array        8.52ms  12.01ms      59.9    9.38MB    13.0 </code></pre>
+1 tensor        4.5ms    5.2ms     189.    76.29KB     7.02
+2 array        8.36ms   10.6ms      95.2    9.38MB    18.5 </code></pre>
 </div>
 </div>
 </details>
@@ -397,8 +397,8 @@ Click for answer
 <pre><code># A tibble: 2 × 6
   expression      min   median `itr/sec` mem_alloc `gc/sec`
   &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 getbatch     1.73ms   2.09ms      451.    3.83KB     2.09
-2 getitem       4.7ms   5.28ms      183.   54.69KB     7.23</code></pre>
+1 getbatch     1.76ms   2.23ms      422.    3.83KB     3.49
+2 getitem      4.71ms   5.78ms      169.   54.69KB     4.62</code></pre>
 </div>
 </div>
 </details>
@@ -492,8 +492,8 @@ Note
     d$new(params = params, lr = lr, betas = betas, eps = eps, 
         weight_decay = weight_decay, amsgrad = amsgrad)
 }
-&lt;bytecode: 0x12dcf0e28&gt;
-&lt;environment: 0x12fbe4e48&gt;
+&lt;bytecode: 0x14f9a1008&gt;
+&lt;environment: 0x14f986518&gt;
 attr(,"Optimizer")
 &lt;optim_adamw&gt; object generator
   Inherits from: &lt;inherit&gt;
@@ -502,7 +502,7 @@ attr(,"Optimizer")
     loop_fun: function (group, param, g, p) 
     step: function (closure = NULL) 
     clone: function (deep = FALSE) 
-  Parent env: &lt;environment: 0x138c7f0e8&gt;
+  Parent env: &lt;environment: 0x150527388&gt;
   Locked objects: FALSE
   Locked class: FALSE
   Portable: TRUE
@@ -517,8 +517,8 @@ attr(,"class")
     d$new(params = params, lr = lr, betas = betas, eps = eps, 
         weight_decay = weight_decay, amsgrad = amsgrad)
 }
-&lt;bytecode: 0x1385c5cb8&gt;
-&lt;environment: 0x1385b90b0&gt;
+&lt;bytecode: 0x14f8d2828&gt;
+&lt;environment: 0x14f90fac0&gt;
 attr(,"Optimizer")
 &lt;optim_ignite_adamw&gt; object generator
 &lt;optim_ignite&gt; object generator
@@ -536,7 +536,7 @@ attr(,"Optimizer")
     .set_param_group_options: function (opt, list) 
     .zero_grad: function (opt) 
     .get_param_groups: function (ptr) 
-  Parent env: &lt;environment: 0x138596e10&gt;
+  Parent env: &lt;environment: 0x14f9274a0&gt;
   Locked objects: FALSE
   Locked class: FALSE
   Portable: TRUE
@@ -572,8 +572,8 @@ disabled.</code></pre>
 <pre><code># A tibble: 2 × 6
   expression                            min  median `itr/sec` mem_alloc `gc/sec`
   &lt;bch:expr&gt;                       &lt;bch:tm&gt; &lt;bch:t&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 learner$train(task_sonar)           501ms   501ms      2.00    14.3MB     5.99
-2 learner_ignite$train(task_sonar)    184ms   198ms      4.73    10.7MB     4.73</code></pre>
+1 learner$train(task_sonar)           498ms   498ms      2.01    14.2MB     6.03
+2 learner_ignite$train(task_sonar)    182ms   185ms      5.14    10.7MB     5.14</code></pre>
 </div>
 </div>
 </section>
@@ -812,23 +812,23 @@ Tip
 <pre><code>List of 2
  $ train:Classes 'data.table' and 'data.frame': 40 obs. of  2 variables:
   ..$ epoch          : num [1:40] 10 20 30 40 50 60 70 80 90 100 ...
-  ..$ classif.logloss: num [1:40] 0.678 0.643 0.569 0.515 0.478 ...
+  ..$ classif.logloss: num [1:40] 0.674 0.631 0.549 0.499 0.455 ...
   ..- attr(*, ".internal.selfref")=&lt;externalptr&gt; 
  $ valid:Classes 'data.table' and 'data.frame': 40 obs. of  2 variables:
   ..$ epoch          : num [1:40] 10 20 30 40 50 60 70 80 90 100 ...
-  ..$ classif.logloss: num [1:40] 0.667 0.618 0.536 0.469 0.436 ...
+  ..$ classif.logloss: num [1:40] 0.668 0.62 0.541 0.479 0.448 ...
   ..- attr(*, ".internal.selfref")=&lt;externalptr&gt; </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(history<span class="sc">$</span>valid)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   epoch classif.logloss
    &lt;num&gt;           &lt;num&gt;
-1:    10       0.6665855
-2:    20       0.6176948
-3:    30       0.5364953
-4:    40       0.4694589
-5:    50       0.4363074
-6:    60       0.4153698</code></pre>
+1:    10       0.6679444
+2:    20       0.6201546
+3:    30       0.5413886
+4:    40       0.4786793
+5:    50       0.4482004
+6:    60       0.4326656</code></pre>
 </div>
 </div>
 <p>Below we plot the training and validation for the different epochs:</p>

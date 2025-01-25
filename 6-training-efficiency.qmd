@@ -21,7 +21,6 @@ Methods for increasing training efficiency can be roughtly split up into:
 
 ## Parallel Processing
 
-
 ### Graphical Processing Unit (GPU)
 
 Using a GPU is crucial when training relatively large neural networks because GPUs are specifically designed to handle the parallel processing required for complex computations.
