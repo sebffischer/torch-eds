@@ -4,6 +4,8 @@ title: "Building Neural Networks with torch"
 
 TODO:
 * need to talk more about loss functions, i.e. cross-entropy.
+
+* Add the start show how to implement a linear model from scratch maybe (with ReLU activation etc.).
 * Show some available modules like relu, convolutions, etc.
   Probably should build a CNN
 
