@@ -1,12 +1,12 @@
-# Deep Learning with R
+# Deep Learning with `torch` in R :fire:
 
-## Overview
+## Overview :book:
 
 This repository contains various notebooks for learning about deep learning with `torch` and `mlr3torch` in R.
 A total of 7 notebooks are available as quarto files in the `notebooks` folder.
 For each notebook, there is also a corresponding quarto notebook with exercises, which also contains the solutions (to be unfolded).
 
-## Setup
+## Setup :card_index_dividers:
 
 In order to be able to successfully run the notebooks and solve the exercises, make sure that you have the right environment set up.
 
