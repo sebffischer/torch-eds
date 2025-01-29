@@ -19,6 +19,15 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
 
+      - name: Install renv
+        run: Rscript -e "install.packages('renv')"
+
+      - name: Restore renv
+        run: Rscript -e "renv::restore()"
+
+      - name: Install torch
+        run: Rscript -e "torch::install_torch()"
+
       - name: Render site
         run: quarto render mlr-org/
 
