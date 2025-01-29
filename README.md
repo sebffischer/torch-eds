@@ -2,9 +2,16 @@
 
 ## Overview :book:
 
-This repository contains various notebooks for learning about deep learning with `torch` and `mlr3torch` in R.
-A total of 7 notebooks are available as quarto files in the `notebooks` folder.
-For each notebook, there is also a corresponding quarto notebook with exercises, which also contains the solutions (to be unfolded).
+This is a course, containing six tutorials and corresponding exercises (with solutions).
+The topics are:
+
+1. Torch Tensors
+2. Autograd
+3. Modules and Data
+4. Optimizers
+5. Intro to mlr3torch (and mlr3 recap)
+6. Training Efficiency
+7. Use Case
 
 ## Setup :card_index_dividers:
 
@@ -64,22 +71,6 @@ To optionally check whether you have GPU support installed (this is not necessar
 torch::cuda_is_available()
 ```
 
-## Rendering the notebooks
+## Credit
 
-Rendering the notebooks and serving the website requires [installing quarto](https://docs.posit.co/resources/install-quarto.html).
-
-To render the notebooks, run the following command in the terminal:
-
-```bash
-quarto render notebooks
-```
-
-The notebooks can be rendered without a GPU available, but some code chunks will then not be executed.
-
-To serve the website, run the following command in the terminal:
-
-```bash
-quarto serve
-```
-
-Note that rendering the website does not render the notebooks but uses the pre-rendered HTML files in the `notebooks-html` folder.
+Some of the content is based on the book [Deep Learning and Scientific Computing with R torch](https://skeydan.github.io/Deep-Learning-and-Scientific-Computing-with-R-torch/) by Sigrid Keydana.
