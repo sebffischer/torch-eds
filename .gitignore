@@ -5,7 +5,6 @@ notebooks/*.html/
 data/*
 Rplots.pdf
 notebooks/.quarto/
-docs/
 /.quarto/
 notebooks/data
 site_libs/
