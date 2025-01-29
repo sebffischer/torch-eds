@@ -16,6 +16,9 @@ website:
         href: "index.html"
       - text: "Tutorials"
         menu:
+          - text: "Intro"
+            href: "../notebooks/0-tutorial-guide.html"
+          - text: "---"
           - text: "1. Tensors"
             href: "../notebooks/1-tensor.html"
           - text: "2. Autograd"

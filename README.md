@@ -1,4 +1,4 @@
-# Deep Learning with `torch` in R :fire:
+# Deep Learning with `(mlr3)torch` in R :fire:
 
 ## Overview :book:
 

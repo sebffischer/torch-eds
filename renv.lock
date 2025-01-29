@@ -1292,8 +1292,14 @@
     },
     "torch": {
       "Package": "torch",
-      "Version": "0.13.0",
-      "Source": "Repository"
+      "Version": "0.13.0.9001",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "mlverse",
+      "RemoteRepo": "torch",
+      "RemoteRef": "main",
+      "RemoteSha": "0a7d97fe5b798e5cdb1e7c1f2ce01d71427eb2aa"
     },
     "torchvision": {
       "Package": "torchvision",

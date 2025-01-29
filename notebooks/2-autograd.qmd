@@ -2,10 +2,7 @@
 title: "Autograd"
 ---
 
-```{r, include = FALSE}
-set.seed(123)
-torch::torch_manual_seed(123)
-```
+{{< include _setup.qmd >}}
 
 # Overview
 

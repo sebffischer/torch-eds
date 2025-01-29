@@ -2,10 +2,7 @@
 title: "Modules and Data"
 ---
 
-```{r, include = FALSE}
-set.seed(123)
-torch::torch_manual_seed(123)
-```
+{{< include _setup.qmd >}}
 
 # From Linear Models to Neural Networks
 

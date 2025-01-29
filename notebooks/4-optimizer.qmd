@@ -2,9 +2,8 @@
 title: "Optimizers"
 ---
 
+{{< include _setup.qmd >}}
 ```{r, include = FALSE}
-set.seed(123)
-torch::torch_manual_seed(123)
 source(here::here("scripts", "helper.R"))
 ```
 

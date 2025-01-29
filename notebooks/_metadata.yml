@@ -1,4 +1,5 @@
-freeze: true
+execute:
+  freeze: true
 knitr:
   opts_chunk:
     fig.align: center

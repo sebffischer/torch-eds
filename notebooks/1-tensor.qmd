@@ -2,16 +2,11 @@
 title: "Torch Tensors"
 ---
 
-```{r, include = FALSE}
-set.seed(123)
-torch::torch_manual_seed(123)
-```
-
-# Torch Overview and Resources
+{{< include _setup.qmd >}}
 
 * **Torch Website**: [https://torch.mlverse.org/](https://torch.mlverse.org/docs/)
 * **API Docs**: [https://torch.mlverse.org/docs/](https://torch.mlverse.org/)
-* **Book by Sigrid Keydana**: [Deep Learning and Scientific Computing with R torch](https://skeydan.github.io/Deep-Learning-and-Scientific-Computing-with-R-torch/).
+* **Book by Sigrid Keydana**: [Deep Learning and Scientific Computing with R torch](https://skeydan.github.io/Deep-Learning-and-Scientific-Computing-with-R-torch/) on which part of this is based.
 * Since `torch` mimics `PyTorch` and the latter has a larger community, you can often learn from the [PyTorch documentation](https://pytorch.org/docs/stable/index.html).
 
 # Installation
