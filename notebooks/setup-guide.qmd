@@ -1,5 +1,5 @@
 ---
-title: "Setup Guide :card_index_dividers:"
+title: "Setup Guide"
 ---
 
 In order to be able to successfully run the notebooks and solve the exercises, make sure that you have the right environment set up.

@@ -11,9 +11,14 @@ markdown:
 website:
   title: "Deep Learning with torch in R"
   navbar:
+    right:
+      - icon: "github"
+        href: "https://github.com/sebffischer/torch-eds"
     left:
       - text: "Setup"
         href: "notebooks/setup-guide.html"
+      - text: "Resources"
+        href: "notebooks/resources.html"
       - text: "Tutorials"
         menu:
           - text: "Intro"

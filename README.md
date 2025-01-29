@@ -2,8 +2,9 @@
 
 ## Overview :book:
 
-This is a course, containing six tutorials and corresponding exercises (with solutions).
-The topics are:
+This is a course, containing seven tutorials and corresponding exercises with solutions on [`torch`](https://torch.mlverse.org/) and [`mlr3torch`](https://mlr3torch.mlr-org.com/).
+
+The seven topics are:
 
 1. Torch Tensors
 2. Autograd
@@ -11,8 +12,13 @@ The topics are:
 4. Optimizers
 5. Intro to mlr3torch (and mlr3 recap)
 6. Training Efficiency
-7. Use Case
+7. Use Case (WIP)
 
+## Contributing
+
+After editing the content, e.g. in the `notebooks` folder, run `quarto render` to render the website.
+This will render the website into the `docs/` folder.
+Upon pushing the changes to GitHub, the content of the `docs/` folder is automatically deployed to GitHub Pages.
 
 ## Credit
 
