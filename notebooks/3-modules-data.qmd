@@ -1,5 +1,5 @@
 ---
-title: "Building Neural Networks with torch"
+title: "Modules and Data"
 ---
 
 ```{r, include = FALSE}
@@ -177,7 +177,7 @@ Some examples of inductive biases in different neural network architectures:
 
 The central component of a CNN is the convolutional layer:
 
-![Convolutional Layer](assets/convolution.png)
+![Convolutional Layer](../assets/convolution.png)
 
 CNNs encode several strong inductive biases about visual data:
 
@@ -260,7 +260,7 @@ cowplot::plot_grid(plotlist = ps, nrow = 5)
 
 While there are many variations of transformer architectures, the main idea is the (self-)attention mechanism:
 
-![](assets/attention.png)
+![](../assets/attention.png)
 Source: https://medium.com/@ramendrakumar/self-attention-d8196b9e9143
 
 Transformer architectures, which power language models like GPT-4 and are commonly used in natural language processing, have different inductive biases:
@@ -323,7 +323,7 @@ ggplot(attn_long, aes(x = Key, y = Query, fill = Weight)) +
 
 Below, we show a visualization of the mechanism:
 
-![](assets/attention2.png){width=60%}
+![](../assets/attention2.png){width=60%}
 
 Source: https://data-science-blog.com/blog/2021/04/07/multi-head-attention-mechanism/
 
@@ -331,7 +331,7 @@ Source: https://data-science-blog.com/blog/2021/04/07/multi-head-attention-mecha
 
 The different layers in a Multi-Layer Perceptron (MLP) consist mainly of an affine-linear transformation followed by a non-linear function, such as a ReLU activation function:
 
-![](assets/mlp-layer.png){width=40%}
+![](../assets/mlp-layer.png){width=40%}
 
 Source: https://scikit-learn.org/1.5/modules/neural_networks_supervised.html
 
@@ -377,7 +377,7 @@ Furthermore, for simple sequential networks, we could have used `nn_sequential` 
 
 The image below visualizes the general structure of this network:
 
-![](assets/neural_networks-002.png){width=60%}
+![](../assets/neural_networks-002.png){width=60%}
 
 Source: https://tikz.net/neural_networks/
 

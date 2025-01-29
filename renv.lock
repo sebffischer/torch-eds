@@ -130,21 +130,8 @@
     },
     "bench": {
       "Package": "bench",
-      "Version": "1.1.3",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "glue",
-        "methods",
-        "pillar",
-        "profmem",
-        "rlang",
-        "stats",
-        "tibble",
-        "utils"
-      ],
-      "Hash": "d3920bdeb09b0dd8562c5ca24da562b7"
+      "Version": "1.1.4",
+      "Source": "Repository"
     },
     "bit": {
       "Package": "bit",
@@ -284,19 +271,7 @@
     "cowplot": {
       "Package": "cowplot",
       "Version": "1.1.3",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "ggplot2",
-        "grDevices",
-        "grid",
-        "gtable",
-        "methods",
-        "rlang",
-        "scales"
-      ],
-      "Hash": "8ef2084dd7d28847b374e55440e4f8cb"
+      "Source": "Repository"
     },
     "cpp11": {
       "Package": "cpp11",
@@ -481,27 +456,7 @@
     "ggplot2": {
       "Package": "ggplot2",
       "Version": "3.5.1",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "MASS",
-        "R",
-        "cli",
-        "glue",
-        "grDevices",
-        "grid",
-        "gtable",
-        "isoband",
-        "lifecycle",
-        "mgcv",
-        "rlang",
-        "scales",
-        "stats",
-        "tibble",
-        "vctrs",
-        "withr"
-      ],
-      "Hash": "44c6a2f8202d5b7e878ea274b1092426"
+      "Source": "Repository"
     },
     "globals": {
       "Package": "globals",
@@ -554,6 +509,11 @@
       ],
       "Hash": "e18861963cbc65a27736e02b3cd3c4a0"
     },
+    "here": {
+      "Package": "here",
+      "Version": "1.0.1",
+      "Source": "Repository"
+    },
     "highr": {
       "Package": "highr",
       "Version": "0.11",
@@ -595,6 +555,11 @@
         "utils"
       ],
       "Hash": "d55aa087c47a63ead0f6fc10f8fa1ee0"
+    },
+    "igraph": {
+      "Package": "igraph",
+      "Version": "2.1.4",
+      "Source": "Repository"
     },
     "isoband": {
       "Package": "isoband",
@@ -841,6 +806,11 @@
       ],
       "Hash": "7a55cccc9782bdb9132d880fa4b5970a"
     },
+    "mlr3oml": {
+      "Package": "mlr3oml",
+      "Version": "0.10.0",
+      "Source": "Repository"
+    },
     "mlr3pipelines": {
       "Package": "mlr3pipelines",
       "Version": "0.7.0",
@@ -898,6 +868,11 @@
         "paradox"
       ],
       "Hash": "5c51cfad67f86a3aa4ca1140fa6a9398"
+    },
+    "mlr3verse": {
+      "Package": "mlr3verse",
+      "Version": "0.3.1",
+      "Source": "Repository"
     },
     "mlr3viz": {
       "Package": "mlr3viz",
@@ -1085,6 +1060,11 @@
         "vctrs"
       ],
       "Hash": "1cba04a4e9414bdefc9dcaa99649a8dc"
+    },
+    "ranger": {
+      "Package": "ranger",
+      "Version": "0.17.0",
+      "Source": "Repository"
     },
     "rappdirs": {
       "Package": "rappdirs",
@@ -1282,25 +1262,7 @@
     "tidyr": {
       "Package": "tidyr",
       "Version": "1.3.1",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "cli",
-        "cpp11",
-        "dplyr",
-        "glue",
-        "lifecycle",
-        "magrittr",
-        "purrr",
-        "rlang",
-        "stringr",
-        "tibble",
-        "tidyselect",
-        "utils",
-        "vctrs"
-      ],
-      "Hash": "915fb7ce036c22a6a33b5a8adb712eb1"
+      "Source": "Repository"
     },
     "tidyselect": {
       "Package": "tidyselect",
@@ -1330,48 +1292,13 @@
     },
     "torch": {
       "Package": "torch",
-      "Version": "0.13.0.9001",
-      "Source": "unknown",
-      "Requirements": [
-        "R6",
-        "Rcpp",
-        "bit64",
-        "callr",
-        "cli",
-        "coro",
-        "desc",
-        "glue",
-        "jsonlite",
-        "magrittr",
-        "methods",
-        "rlang",
-        "safetensors",
-        "scales",
-        "stats",
-        "tools",
-        "utils",
-        "withr"
-      ],
-      "Hash": "4b89e0866aa2bedf6306ce44296f636f"
+      "Version": "0.13.0",
+      "Source": "Repository"
     },
     "torchvision": {
       "Package": "torchvision",
       "Version": "0.6.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "abind",
-        "fs",
-        "jpeg",
-        "magrittr",
-        "png",
-        "rappdirs",
-        "rlang",
-        "torch",
-        "utils",
-        "withr"
-      ],
-      "Hash": "b2a96f59385ceb8633c447b69b019402"
+      "Source": "Repository"
     },
     "utf8": {
       "Package": "utf8",
@@ -1461,6 +1388,11 @@
       ],
       "Hash": "9a48327e3725f003d7420aa972c5fcb3"
     },
+    "xgboost": {
+      "Package": "xgboost",
+      "Version": "1.7.8.1",
+      "Source": "Repository"
+    },
     "xtable": {
       "Package": "xtable",
       "Version": "1.8-4",
@@ -1483,9 +1415,7 @@
     "zeallot": {
       "Package": "zeallot",
       "Version": "0.1.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "ee9b643aa8331c45d8d82eb3a137c9bc"
+      "Source": "Repository"
     }
   }
 }

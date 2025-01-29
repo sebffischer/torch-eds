@@ -1,44 +1,34 @@
 ---
 title: "Optimizers"
-format: html
-bibliography: references.bib
 ---
 
 ```{r, include = FALSE}
 set.seed(123)
 torch::torch_manual_seed(123)
-source("helper.R")
+source(here::here("scripts", "helper.R"))
 ```
-
 
 ## Overview
 
-In this notebook we will cover the optimization aspect of deep learning and how to work with optimizers in `torch`.
-Optimizers are algorithms that iteratively adjust the parameters of a neural network to minimize the loss function during training.
-They define how the networks *learn* from the data.
+In this notebook, we will cover the optimization aspect of deep learning and how to work with optimizers in `torch`. Optimizers are algorithms that iteratively adjust the parameters of a neural network to minimize the loss function during training. They define how the networks *learn* from the data.
 
 Let's denote with $L(\theta)$ the loss function, which assigns the empirical risk given data $\{(x_i, y_i)\}_{i = 1}^n$ to a parameter vector $\theta$:
 $$L(\theta) = \sum_{i=1}^n L(f_\theta(x_i), y_i)$$
-Here $f_\theta$ is the model's prediction function, $x_i$ is the $i$-th sample in the training data and $y_i$ is the corresponding target value.
+Here, $f_\theta$ is the model's prediction function, $x_i$ is the $i$-th sample in the training data, and $y_i$ is the corresponding target value.
 
 The goal of the optimizer is to find the parameter vector $\theta^*$ that minimizes the loss function $L(\theta)$:
 $$\theta^* = \arg \min_\theta L(\theta)$$
 
-This is done by iteratively updating the parameter vector $\theta$ using the gradient of the loss function with respect to the parameter vector.
-The simplified update formula for a parameter $\theta$ at time step $t$ is given by:
+This is done by iteratively updating the parameter vector $\theta$ using the gradient of the loss function with respect to the parameter vector. The simplified update formula for a parameter $\theta$ at time step $t$ is given by:
 
 $$\theta_{t+1} = \theta_t - \eta \frac{\partial L}{\partial \theta_t}$$
 
 Where:
 
-- $\theta_t$ is the current value of the parameter vector at time step $t$
-
-- $\theta_{t+1}$ is the new value of the parameter after the update
-
-- $\eta$ (eta) is the learning rate, which controls how big of a step we take
-
-- $\frac{\partial L}{\partial \theta_t}$ is the derivative of the loss function $L$ with respect to parameter $\theta$, i.e., the gradient
-
+- $\theta_t$ is the current value of the parameter vector at time step $t$.
+- $\theta_{t+1}$ is the new value of the parameter after the update.
+- $\eta$ (eta) is the learning rate, which controls how big of a step we take.
+- $\frac{\partial L}{\partial \theta_t}$ is the derivative of the loss function $L$ with respect to parameter $\theta$, i.e., the gradient.
 
 ::: {.callout-note}
 ## Quiz: Learning Rate
@@ -47,9 +37,8 @@ Question 1: Can you explain what happens when the learning rate is too high? Wha
 
 <details>
 <summary>Click for answer</summary>
-A too high learning rate will cause the parameters to overshoot the minimum and diverge.
-A too low learning rate will cause the parameters to converge slowly.
-![](assets/lr_size.png)
+A too high learning rate will cause the parameters to overshoot the minimum and diverge. A too low learning rate will cause the parameters to converge slowly.
+![](../assets/lr_size.png)
 Source: https://stackoverflow.com/questions/62690725/small-learning-rate-vs-big-learning-rate
 </details>
 :::
@@ -78,7 +67,7 @@ $$\theta_{t+1} = \theta_t - \eta \nabla L^B_t$$
 
 This is visualized in the image below:
 
-![](assets/gd_vs_sgd.png)
+![](../assets/gd_vs_sgd.png)
 
 ::: {.callout-note}
 ## Quiz: Vanilla SGD
@@ -91,7 +80,7 @@ This is visualized in the image below:
 
 - Larger batches provide more accurate gradient estimates.
 - Smaller batches introduce more noise but allow more frequent parameter updates.
-![](assets/lr_size.png)
+![](../assets/lr_size.png)
 </details>
 
 **Question 2:** The mini-batch gradient is an approximation of the gradient over the full dataset. Does the latter also approximate something? If so, what?
@@ -149,17 +138,13 @@ This is because the standard error is inversely proportional to the square root 
 
 ## Mini-Batch Gradient Descent: It's not all about runtime
 
-As we have now covered some of the dynamics of a simple gradient-based optimizer, we can examine the final parameter vector $\theta^*$ that the optimizer converges to.
-When using a gradient-based optimizer, the updates will stop once the gradient is close to zero.
-What will now discuss the type of solutions where this is true and their properties.
+As we have now covered some of the dynamics of a simple gradient-based optimizer, we can examine the final parameter vector $\theta^*$ that the optimizer converges to. When using a gradient-based optimizer, the updates will stop once the gradient is close to zero. We will now discuss the type of solutions where this is true and their properties.
 
-We need to distuingish *saddle points* from *local minima* from *global minima*:
+We need to distinguish *saddle points* from *local minima* from *global minima*:
 
-![](assets/minimum_vs_saddlepoint.png)
+![](../assets/minimum_vs_saddlepoint.png)
 
-In deep learning, where high-dimensional parameter spaces are common, saddle points are more likely to occur than local minima [@dauphin2014identifying].
-However, due to the stochastic nature of SGD, optimizers will find local minima instead of saddle points @pmlr-v80-daneshmand18a.
-
+In deep learning, where high-dimensional parameter spaces are common, saddle points are more likely to occur than local minima [@dauphin2014identifying]. However, due to the stochastic nature of SGD, optimizers will find local minima instead of saddle points @pmlr-v80-daneshmand18a.
 
 ::: {.callout-note}
 ## Quiz: Local vs. Global Minima, Generalization
@@ -171,7 +156,6 @@ Question 1: Do you believe SGD will find local or global minima? Explain your re
 Because the gradient only has **local** information about the loss function, SGD finds local minima.
 </details>
 
-
 Question 2: Assuming we have found a $\theta^*$ that has low training loss, does this ensure that we have found a good model?
 
 <details>
@@ -180,24 +164,17 @@ No, because we only know that the model has low training loss, but not the test 
 </details>
 :::
 
-SGD has been empirically shown to find solutions that generalize well to unseen data.
-This phenomenon is attributed to the implicit regularization effects of SGD, where the noise introduced by mini-batch sampling helps guide the optimizer towards broader minima with smaller L2 norms.
-These broader minima are typically associated with better generalization performance compared to sharp minima.
+SGD has been empirically shown to find solutions that generalize well to unseen data. This phenomenon is attributed to the implicit regularization effects of SGD, where the noise introduced by mini-batch sampling helps guide the optimizer towards broader minima with smaller L2 norms. These broader minima are typically associated with better generalization performance compared to sharp minima.
 
-![](assets/flat_minima_generalization.png)
+![](../assets/flat_minima_generalization.png)
 
 Source: https://www.researchgate.net/figure/Flat-minima-results-in-better-generalization-compared-to-sharp-minima-Pruning-neural_fig2_353068686
 
-These properties are also known as *implicit regularization* of SGD.
-Regularization generally refers to techniques that prevent overfitting and improve generalization.
-There are also explicit regularization techniques, which we will cover next.
+These properties are also known as *implicit regularization* of SGD. Regularization generally refers to techniques that prevent overfitting and improve generalization. There are also explicit regularization techniques, which we will cover next.
 
 ### Weight Decay
 
-Because weight decay in SGD is equivalent to adding a regularization penalty term to the loss function, we can draw a parallel to the regularization techniques used in statistic such as ridge regression.
-Regularization in machine learning/statistics is used to prevent overfitting by adding a penalty term to the model's loss function, which discourages overly complex models that might fit noise in the training data.
-It helps improve generalization to unseen data.
-For example, in ridge regression, the regularization term penalizes large coefficients by adding the squared magnitude of the coefficients to the loss function:
+Because weight decay in SGD is equivalent to adding a regularization penalty term to the loss function, we can draw a parallel to the regularization techniques used in statistics such as ridge regression. Regularization in machine learning/statistics is used to prevent overfitting by adding a penalty term to the model's loss function, which discourages overly complex models that might fit noise in the training data. It helps improve generalization to unseen data. For example, in ridge regression, the regularization term penalizes large coefficients by adding the squared magnitude of the coefficients to the loss function:
 
 $$
 \mathcal{L}(y, \hat{y}) = \sum_{i=1}^n \left(y_i - \hat{y}_i\right)^2 + \lambda \sum_{j=1}^p \beta_j^2
@@ -206,12 +183,10 @@ $$
 This will make the model prefer less complex solutions, where complexity is measured by the L2 norm of the coefficients.
 
 :::{.callout-note}
-For more complex optimizers such as Adam(W), weight decay is not equivalent to adding a regularization penalty term to the loss function.
-However, the main idea of both approaches is still to shrink the weights to $0$ during training.
+For more complex optimizers such as Adam, weight decay is not equivalent to adding a regularization penalty term to the loss function. However, the main idea of both approaches is still to shrink the weights to $0$ during training.
 :::
 
-
-Here, $\lambda$ controls the strength of the regularization, $y_i$￼ are the observed values, $\hat{y}_i$ are the predicted values, and $w_i$ are the model coefficients.
+Here, $\lambda$ controls the strength of the regularization, $y_i$ are the observed values, $\hat{y}_i$ are the predicted values, and $w_i$ are the model coefficients.
 
 If we integrate weight decay into the gradient update formula, we get the following:
 
@@ -219,15 +194,15 @@ $$\theta_{t+1} = \theta_t - \eta \big(\frac{\partial L}{\partial \theta_t} - \la
 
 This formula shows that the weight decay term ($- \lambda \theta_t$) effectively shrinks the weights during each update, helping to prevent overfitting.
 
-![](assets/regularization.png)
+![](../assets/regularization.png)
 
 ## Momentum
 
 Momentum is a technique that helps accelerate gradient descent by using an exponential moving average of past gradients. Like a ball rolling down a hill, momentum helps the optimizer:
 
-- Move faster through areas of consistent gradient direction
-- Push through sharp local minima and saddle points
-- Dampen oscillations in areas where the gradient frequently changes direction
+- Move faster through areas of consistent gradient direction.
+- Push through sharp local minima and saddle points.
+- Dampen oscillations in areas where the gradient frequently changes direction.
 
 The exponential moving momentum update can be expressed mathematically as:
 
@@ -237,7 +212,6 @@ $$
 
 In order to avoid having to keep track of all the gradients, we can calculate the update in two steps as follows:
 
-
 $$
 v_t = \beta_1 v_{t-1} + (1 - \beta_1) \nabla_\theta L(\theta_t)
 $$
@@ -246,10 +220,9 @@ $$
 \theta_{t+1} = \theta_t - \eta \frac{v_t}{1 - \beta_1^t}
 $$
 
-The hyperparameter $\beta_1$ is the momentum decay rate (typically 0.9), $v_t$ is the exponential moving average of gradients, and $\eta$ is the learning rate as before.
-Note that dividing by $1 - \beta_1^t$ counteracts a bias because $v_0$ is initialized to $0$.
+The hyperparameter $\beta_1$ is the momentum decay rate (typically 0.9), $v_t$ is the exponential moving average of gradients, and $\eta$ is the learning rate as before. Note that dividing by $1 - \beta_1^t$ counteracts a bias because $v_0$ is initialized to $0$.
 
-![](assets/momentum.png)
+![](../assets/momentum.png)
 
 ## Adaptive Learning Rates
 
@@ -258,49 +231,43 @@ Adaptive learning rate methods automatically adjust the learning rate for each p
 1. Different parameters may require different learning rates.
 2. The optimal learning rate often changes during training.
 
-Before, we had one global learning rate $\eta$ for all parameters.
-However, learning rates are now allowed to:
+Before, we had one global learning rate $\eta$ for all parameters. However, learning rates are now allowed to:
 
-1. change over time
-2. be different for different parameters.
+1. Change over time.
+2. Be different for different parameters.
 
 Our vanilla SGD update formula is now generalized to handle adaptive learning rates:
 
 $$\theta_{t+1} = \theta_t - \eta_t \cdot \frac{\nabla_\theta L(\theta_t)}{\sqrt{v_t} + \epsilon}$$
 
-Here, $\eta_t$ is now not a scalar learning rate, but a vector of learning rates for each parameter and '$\cdot$' denotes the element-wise multiplication.
-Further, $\epsilon$ is a small constant for numerical stability.
+Here, $\eta_t$ is now not a scalar learning rate, but a vector of learning rates for each parameter, and '$\cdot$' denotes the element-wise multiplication. Further, $\epsilon$ is a small constant for numerical stability.
 
 In AdamW, the adaptive learning rate is controlled by the second moment estimate (squared gradients):
 
 $$v_t = \beta_2 v_{t-1} + (1-\beta_2)(g_t)^2$$
 $$\hat{\eta}_t = \eta \frac{1}{\sqrt{v_t + \epsilon}}$$
 
-In words this means: In steep directions where the gradient is large, the learning rate is small and vice versa.
-The parameters $\beta_2$ and $\epsilon$ are hyperparameters that control the decay rate and numerical stability of the second moment estimate.
+In words, this means: In steep directions where the gradient is large, the learning rate is small and vice versa. The parameters $\beta_2$ and $\epsilon$ are hyperparameters that control the decay rate and numerical stability of the second moment estimate.
 
-![](assets/adagrad.png)
+![](../assets/adagrad.png)
 
-When combining weight decay, adaptive learning rates and momentum, we get the AdamW optimizer.
-It therefore has parameters:
+When combining weight decay, adaptive learning rates, and momentum, we get the AdamW optimizer. It therefore has parameters:
 
-* `lr`: The learning rate
-* `weight_decay`: The weight decay parameter
-* `betas`: The momentum parameters ($\beta_1$ and $\beta_2$)
-* `eps`: The numerical stability parameter
+* `lr`: The learning rate.
+* `weight_decay`: The weight decay parameter.
+* `betas`: The momentum parameters ($\beta_1$ and $\beta_2$).
+* `eps`: The numerical stability parameter.
 
 Note that AdamW also has another configuration parameter `amsgrad`, which is disabled by default in `torch`, but which can help with convergence.
 
 # Optimizers in torch
 
-`torch` provides several common optimizers, including SGD, Adam, AdamW, RMSprop, and Adagrad.
-The main optimizer API consists of:
+`torch` provides several common optimizers, including SGD, Adam, AdamW, RMSprop, and Adagrad. The main optimizer API consists of:
 
 1. Initializing the optimizer, which requires passing the parameters of the module to be optimized and setting the optimizer's hyperparameters such as the learning rate.
-1. `step()`: Update parameters using current gradients
-1. `zero_grad()`: Reset gradients of all the parameters to zero before each backward pass
-1. Just like `nn_module`s they have a `$state_dict()` which can e.g. be saved to later load it using `$load_state_dict()`.
-
+2. `step()`: Update parameters using current gradients.
+3. `zero_grad()`: Reset gradients of all the parameters to zero before each backward pass.
+4. Just like `nn_module`s, they have a `$state_dict()` which can, for example, be saved to later load it using `$load_state_dict()`.
 
 We will focus on the AdamW optimizer, but the others work analogously.
 ```{r}
@@ -335,7 +302,6 @@ ggplot(data.frame(X = as.numeric(X), Y = as.numeric(Y)), aes(x = X, y = Y)) +
 
 Performing a (full) gradient update using the AdamW optimizer consists of:
 
-
 1. Calculating the forward pass
 
    ```{r}
@@ -365,8 +331,7 @@ Note that after the optimizer step, the gradients are not reset to zero but are 
 model$weight$grad
 ```
 
-If we were to perform another backward pass, the gradient would be added to the current gradient.
-If this is not desired, we can set an individual gradient of a tensor to zero:
+If we were to perform another backward pass, the gradient would be added to the current gradient. If this is not desired, we can set an individual gradient of a tensor to zero:
 
 ```{r}
 model$weight$grad$zero_()
@@ -379,20 +344,17 @@ opt$zero_grad()
 model$weight$grad
 ```
 
-
 ::: {.callout-note}
 ## Quiz: Guess which Parameter is Varied
 
-We will now show some real trajectories of the AdamW optimizer applied to the linear regression problem from above where one specific parameter is varied.
-Recall that:
+We will now show some real trajectories of the AdamW optimizer applied to the linear regression problem from above where one specific parameter is varied. Recall that:
 
 * $\eta$: The learning rate controls the step size of the optimizer.
-* $\lambda$: The weight decay parameter controls the bias of the optimization towards a parameter being close to zero.
-  A value of $0$ means no weight decay.
+* $\lambda$: The weight decay parameter controls the bias of the optimization towards a parameter being close to zero. A value of $0$ means no weight decay.
 * $\beta_1$: The momentum parameter. A value of $0$ means no momentum.
 * $\beta_2$: The second moment parameter. A value of $0$ means no second moment adjustment.
 
-The plots below show contour lines of the empirical loss function, i.e. two values that are on the same contour line have the same loss.
+The plots below show contour lines of the empirical loss function, i.e., two values that are on the same contour line have the same loss.
 
 Question 1: Which parameter is varied here? Explain your reasoning.
 
@@ -401,8 +363,7 @@ plot_adamw_trajectories(lr = list(0.02, 0.04), weight_decay = 0, epochs = 2, bet
 ```
 <details>
 <summary>Click for answer</summary>
-The learning rate is varied.
-This can be seen as the gradient updates for the right trajectory are larger than for the left trajectory.
+The learning rate is varied. This can be seen as the gradient updates for the right trajectory are larger than for the left trajectory.
 </details>
 
 Question 2: Which parameter is varied below? Explain your reasoning.
@@ -412,12 +373,10 @@ plot_adamw_trajectories(lr = 0.01, weight_decay = list(1, 8), epochs = 10, betas
 ```
 <details>
 <summary>Click for answer</summary>
-The weight decay is varied.
-We can see this as the final parameter value for the right trajectory is closer to zero than for the left trajectory.
+The weight decay is varied. We can see this as the final parameter value for the right trajectory is closer to zero than for the left trajectory.
 </details>
 
-Question 3: Which parameter is varied below? Explain your reasoning.
-Can you explain why this happens?
+Question 3: Which parameter is varied below? Explain your reasoning. Can you explain why this happens?
 
 ```{r, echo = FALSE, fig.width = 8, fig.height = 4}
 betas1 = list(c(0, 0.999), c(0.9, 0.999))
@@ -425,9 +384,7 @@ plot_adamw_trajectories(lr = 0.01, weight_decay = 0, epochs = 40, betas = betas1
 ```
 <details>
 <summary>Click for answer</summary>
-The momentum parameter $\beta_1$ is varied.
-There is no momentum on the left side so the gradient steps are more noisy.
-On the right side, the momentum is set to $0.9$ so over time, momentum in the 'correct' direction is accumulated.
+The momentum parameter $\beta_1$ is varied. There is no momentum on the left side, so the gradient steps are more noisy. On the right side, the momentum is set to $0.9$, so over time, momentum in the 'correct' direction is accumulated.
 </details>
 
 Question 4: Which parameter is varied below? Explain your reasoning.
@@ -439,36 +396,27 @@ plot_adamw_trajectories(lr = 0.002, weight_decay = 0, epochs = 70, betas = betas
 
 <details>
 <summary>Click for answer</summary>
-The $\beta_2$ parameter is varied.
-There is no second moment adjustment on the left side, but there is on the right side.
-Because the gradients in the direction of the bias are larger than in the direction of the weight, the second moment adjustment helps to reduce the learning rate in the direction of the bias.
+The $\beta_2$ parameter is varied. There is no second moment adjustment on the left side, but there is on the right side. Because the gradients in the direction of the bias are larger than in the direction of the weight, the second moment adjustment helps to reduce the learning rate in the direction of the bias.
 </details>
 :::
 
-
 ## Learning Rate Schedules
 
-While we have already covered dynamic learning rates, it can still be beneficial to use a **learning rate scheduler** to further improve convergence.
-There, the learning rate is not a constant scalar, but a function of the current epoch.
-The update formula for the simple SGD optimizer is now:
+While we have already covered dynamic learning rates, it can still be beneficial to use a **learning rate scheduler** to further improve convergence. There, the learning rate is not a constant scalar, but a function of the current epoch. The update formula for the simple SGD optimizer is now:
 
 $$\theta_{t+1} = \theta_t - \eta_t \cdot \frac{\nabla_\theta L(\theta_t)}{\sqrt{v_t} + \epsilon}$$
 
 **Decaying learning rates**:
 
-This includes gradient decay, cosine annealing, and cyclical learning rates.
-The general idea is to start with a high learning rate and then gradually decrease it over time.
-One explanation for this is that this prevents the network from memorizing noisy data and decreasing the learning rate helps allows to learn more complex patterns that are less transferable [@you2019doeslearningratedecay].
+This includes gradient decay, cosine annealing, and cyclical learning rates. The general idea is to start with a high learning rate and then gradually decrease it over time.
 
 **Warmup**:
 
-Warmup is a technique that gradually increases the learning rate from a small value to a larger value over a specified number of epochs.
-For an explanation of why warmup is beneficial, see @kalra2024warmup.
+Warmup is a technique that gradually increases the learning rate from a small value to a larger value over a specified number of epochs. For an explanation of why warmup is beneficial, see @kalra2024warmup.
 
 **Cyclical Learning Rates**:
 
-Cyclical learning rates are a technique that involves periodically increasing and decreasing the learning rate.
-This can help the optimizer to travers saddle points faster and find better solutions [@smith2017cyclical].
+Cyclical learning rates are a technique that involves periodically increasing and decreasing the learning rate. This can help the optimizer to traverse saddle points faster and find better solutions.
 
 ```{r, echo = FALSE}
 library(ggplot2)
@@ -514,17 +462,13 @@ ggplot(lr_data, aes(x = epoch, y = learning_rate, color = method)) +
   )
 ```
 
-
-In `torch`, learning rate schedulers are prefixed by `lr_`, such as the simple `lr_step`, where the learning rate is multiplied by a factor of `gamma` every `step_size` epochs.
-In order to use them, we need to pass the optimizer to the scheduler and specify additional arguments.
+In `torch`, learning rate schedulers are prefixed by `lr_`, such as the simple `lr_step`, where the learning rate is multiplied by a factor of `gamma` every `step_size` epochs. In order to use them, we need to pass the optimizer to the scheduler and specify additional arguments.
 
 ```{r}
 scheduler = lr_step(opt, step_size = 2, gamma = 0.1)
 ```
 
-The main API of a learning rate scheduler is the `$step()` method, which updates the learning rate.
-For some schedulers, this needs to be called after each optimization step, for others after each epoch.
-You can find this out by consulting the documentation of the specific scheduler.
+The main API of a learning rate scheduler is the `$step()` method, which updates the learning rate. For some schedulers, this needs to be called after each optimization step, for others after each epoch. You can find this out by consulting the documentation of the specific scheduler.
 
 ```{r}
 opt$param_groups[[1L]]$lr
@@ -534,17 +478,11 @@ scheduler$step()
 opt$param_groups[[1L]]$lr
 ```
 
-
-
 ## Setting the Learning Rate
 
-Arguably the most important hyperparameter is the learning rate.
-While we have now discussed the dynamics of the optimizer hyperparameters, the primary practical concern is how to set them.
-As a start, one can see whether good results can be achieved with the default hyperparameters.
-Alternatively, one can look at how others (e.g. in scientific papers) have set the hyperparameters for similar architectures and tasks.
+Arguably the most important hyperparameter is the learning rate. While we have now discussed the dynamics of the optimizer hyperparameters, the primary practical concern is how to set them. As a start, one can see whether good results can be achieved with the default hyperparameters. Alternatively, one can look at how others (e.g., in scientific papers) have set the hyperparameters for similar architectures and tasks.
 
-When setting the learning rate, it is a good idea to then inspect the loss over time to see whether the learning rate is too high (instability) or too low (slow convergence).
-Below, we show the learning curve for two different learning rates.
+When setting the learning rate, it is a good idea to then inspect the loss over time to see whether the learning rate is too high (instability) or too low (slow convergence). Below, we show the learning curve for two different learning rates.
 
 ```{r}
 library(mlr3torch)
@@ -555,19 +493,13 @@ task = tsk("spam")
 l1$train(task)
 l2$train(task)
 
-d = data.frame(
-  epoch = rep(1:epochs, times = 2),
-  logloss = c(l1$model$callbacks$history$train$classif.logloss, l2$model$callbacks$history$train$classif.logloss),
-  lr = rep(c("0.01", "0.001"), each = epochs)
-)
-
-ggplot(d, aes(x = epoch, y = logloss, color = lr)) +
-  geom_line() +
+ggplot(d, aes(x = epoch, y = trainlogloss, color = lr)) +
+  geom_line(aes(y = train.classif.logloss, color = "training logloss")) +
+  geom_line(aes(y = valid.classif.logloss, color = "validation logloss")) +
   theme_minimal()
 ```
 
-When no good results can easily be achieved with defaults or with learning rates from the literature, one can employ hyperparameter optimization to find good learning rates.
-It is recommended to tune the learning rate on a logarithmic scale.
+When no good results can easily be achieved with defaults or with learning rates from the literature, one can employ hyperparameter optimization to find good learning rates. It is recommended to tune the learning rate on a logarithmic scale.
 
 ## Saving an Optimizer
 
@@ -579,13 +511,12 @@ state_dict = opt$state_dict()
 
 This state dictionary contains:
 
-1. The `$param_groups` which contains the parameters and their associated hyperparameters
-2. The `$state` which contains the optimizer's internal state, such as the momentum and second moment estimates
+1. The `$param_groups` which contains the parameters and their associated hyperparameters.
+2. The `$state` which contains the optimizer's internal state, such as the momentum and second moment estimates.
 
 ```{r}
 state_dict$param_groups[[1L]]
 ```
-
 
 ::: {.callout-note}
 It is possible to set different parameters (such as learning rate) for different parameter groups.
@@ -635,13 +566,3 @@ state_dict2 = torch_load(pth)
 opt2 <- optim_adamw(model$parameters, lr = 0.2)
 opt2$load_state_dict(state_dict2)
 ```
-
-
-# Exercises:
-
-1. Apply different configurations of the AdamW optimizer to a problem (local and global minima).
-   Play around witht the parameters and also explore using a learning rate scheduler.
-   Visualize the trajectories (using a function we provide).
-
-2. Implement your own optimizer.
-   TODO: Define formulas.

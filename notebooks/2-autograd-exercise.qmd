@@ -1,11 +1,8 @@
 ---
-title: "Autograd Exercises"
+title: "Autograd"
 ---
 
-```{r, include = FALSE}
-set.seed(123)
-torch::torch_manual_seed(123)
-```
+{{< include _setup.qmd >}}
 
 **Question 1**: Appreciating autograd
 
@@ -19,8 +16,8 @@ As well as the function $g(x) = f(f(f(x)))$
 
 Calculate the gradient of both functions at point $x = 2$.
 
-<details>
-<summary>Solution</summary>
+::: {.content-visible when-meta=solutions}
+**Solution**
 
 ```{r}
 library(torch)
@@ -32,7 +29,7 @@ g <- function(x) {
   f(f(f(x)))
 }
 
-# store the gradient, i.e. f'(2)
+# Store the gradient, i.e., f'(2)
 f(x)$backward()
 grad <- x$grad$clone()
 grad
@@ -40,23 +37,23 @@ grad
 # For another backward pass, we reset the gradient as they otherwise accumulate
 x$grad$zero_()
 
-# calculate the gradient of g(x)
+# Calculate the gradient of g(x)
 g(x)$backward()
 
-# create copy of the gradient
+# Create a copy of the gradient
 grad2 <- x$grad$clone()
 grad2
 
 # Zero gradients for good measure
 x$grad$zero_()
 ```
-</details>
+:::
 
 **Question 2**: Approximating functions with gradients
 
-The defining feature of the gradient is that it allows to approximate the function locally by a linear function.
+The defining feature of the gradient is that it allows us to approximate the function locally by a linear function.
 
-I.e. for some value $x^*$, we know for very small $\delta$, that
+I.e., for some value $x^*$, we know for very small $\delta$, that
 
 $$
 f(x^* + \delta) \approx f(x^*) + f'(x^*) \cdot \delta
@@ -65,17 +62,16 @@ $$
 Plot the function from earlier as well as the local linear approximation at $x = 2$ using `ggplot2`.
 
 1. Define a function `f_approx` that takes a value `delta` and returns the value of the function at `x^* + delta` using the linear approximation.
-2. Create a sequence with 100 equidistant values between -4 to 4  using `torch_linspace()`
+2. Create a sequence with 100 equidistant values between -4 to 4 using `torch_linspace()`.
 3. Create a `data.frame` with columns `x`, `y_true`, `y_approx`.
 4. Use `ggplot2` to plot the function and its linear approximation.
 
-
-<details>
-<summary>Solution</summary>
+::: {.content-visible when-meta=solutions}
+**Solution**
 
 ```{r}
 library(ggplot2)
-x <- x$detach() # no need to track gradients anymore
+x <- x$detach() # No need to track gradients anymore
 deltas <- torch_linspace(-4, 4, 100)
 y_true <- f(x + deltas)
 y_approx <- f(x) + grad * deltas
@@ -94,8 +90,7 @@ ggplot(d, aes(x = x)) +
   )
 ```
 
-</details>
-
+:::
 
 **Question 3**: Look ma, I made my own autograd function
 
@@ -134,7 +129,7 @@ The return value of the backward pass should be a list of gradients with respect
 To check whether a gradient for an input is needed (has `requires_grad = TRUE`), you can use `ctx$needs_input_grad` which is a named list with boolean values for each input.
 
 The backward function additionally takes a second argument `grad_output`, which is the gradient of the output:
-E.g. if our function is $f(x)$ and we calculate the gradient of $g(x) = h(f(x))$, then `grad_output` the derivative of $g$ with respect to its input, evaluated at $f(x)$.
+E.g., if our function is $f(x)$ and we calculate the gradient of $g(x) = h(f(x))$, then `grad_output` is the derivative of $g$ with respect to its input, evaluated at $f(x)$.
 This is essentially the chain rule: $\frac{\partial g}{\partial x} = \frac{\partial g}{\partial f} \cdot \frac{\partial f}{\partial x}$.
 
 Fill out the missing parts (`...`) in the code below.
@@ -171,9 +166,8 @@ x <- torch_tensor(3, requires_grad = TRUE)
 x$grad
 ```
 
-
-<details>
-<summary>Solution</summary>
+::: {.content-visible when-meta=solutions}
+**Solution**
 
 ```{r}
 relu <- autograd_function(
@@ -202,3 +196,4 @@ x <- torch_tensor(3, requires_grad = TRUE)
 (relu(x)^2)$backward()
 x$grad
 ```
+:::

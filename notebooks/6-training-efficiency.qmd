@@ -1,11 +1,6 @@
 ---
-title: "Speeding Up Training"
+title: "Training Efficiency"
 ---
-
-TODO:
-* learning rate / optimizer state and freezing?
-* Explain difference between preprocessing and augmentation.
-* Mention that one should usually use a predefined architecture: Copy it from Python (can link to the torch tutorial to do so)
 
 ```{r, include = FALSE}
 set.seed(123)
@@ -129,7 +124,7 @@ The *tiny imagenet* dataset is a dataset of 100 000 images of size 64x64x3.
 It is a subset of the famous *imagenet* dataset.
 Below, we show some examples from the dataset:
 
-![](assets/tiny-imagenet.png)
+![](../assets/tiny-imagenet.png)
 
 ```{r, include = FALSE}
 library(mlr3torch)
@@ -295,7 +290,7 @@ For example, if we set `num_workers = 4L`, 4 R processes will be started that lo
 These processes then send the batches to the main process.
 The image below visualizes this process:
 
-![](assets/parallel-dataloader.png)
+![](../assets/parallel-dataloader.png)
 
 Creating such a parallel dataloader is as easy as setting the `num_workers` parameter to a value greater than 0.
 
@@ -314,7 +309,7 @@ The moving of the data to the GPU cannot be done on the processes that are loadi
 One way to speed up the data loading process is to pin the memory of the data to the GPU.
 Before a tensor can be moved from RAM to VRAM, it needs to be in so-called page-locked memory which can be done using the `pin_memory` parameter.
 
-![](assets/pinned-memory.png)
+![](../assets/pinned-memory.png)
 
 
 ```{r, eval = cuda_is_available()}
@@ -567,24 +562,16 @@ mlp_learner = lrn("classif.mlp",
 mlp_learner$train(task)
 history = mlp_learner$model$callbacks$history
 str(history)
-head(history$valid)
+head(history)
 ```
 
 Below we plot the training and validation for the different epochs:
 
 ```{r, echo = FALSE}
 library(ggplot2)
-# Convert history to a data frame for plotting
-history_df = data.frame(
-  epoch = history$train$epoch,
-  train_loss = history$train$classif.logloss,
-  valid_loss = history$valid$classif.logloss
-)
-
-# Plot the training and validation loss over epochs
 ggplot(history_df, aes(x = epoch)) +
-  geom_line(aes(y = train_loss, color = "Training Loss")) +
-  geom_line(aes(y = valid_loss, color = "Validation Loss")) +
+  geom_line(aes(y = train.classif.logloss, color = "Training Loss")) +
+  geom_line(aes(y = valid.calssif.logloss, color = "Validation Loss")) +
   labs(title = "MLP Training and Validation Loss Over Epochs",
        x = "Epoch",
        y = "Log-Loss") +
@@ -795,7 +782,7 @@ Dropout is a regularization technique used to prevent overfitting in neural netw
 During each training iteration, dropout randomly "drops" a subset of neurons by setting their activations to zero with a specified probability (commonly between 20% to 50%). This forces the network to distribute the learned representations more evenly across neurons, reducing the reliance on any single neuron and mitigating overfitting.
 Dropout is more commonly used in the context of fully connected layers.
 
-![](assets/dropout.png){fig-align="center" width=100%}
+![](../assets/dropout.png){fig-align="center" width=100%}
 
 Source: https://medium.com/konvergen/understanding-dropout-ddb60c9f98aa
 
@@ -865,7 +852,7 @@ When the model is then trained on a new task, only the last layer is replaced wi
 
 This is visualized below:
 
-![](assets/transfer-learning.svg)
+![](../assets/transfer-learning.svg)
 
 Source: https://en.wikipedia.org/wiki/Transfer_learning
 
@@ -963,7 +950,3 @@ No, as the purpose of data augmentation is not to improve an individual predicti
 Looking at the performance of augmented validation data is, however, also not a mistake.
 </details>
 :::
-
-# Exercises:
-
-TODO:

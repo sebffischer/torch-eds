@@ -58,6 +58,28 @@ torch::install_torch()
 
 If this completes successfully, you are ready to go! :rocket:
 
+To optionally check whether you have GPU support installed (this is not necessary for the exercises), run the following command:
+
+```r
+torch::cuda_is_available()
+```
+
 ## Rendering the notebooks
 
-TODO: Make-command
+Rendering the notebooks and serving the website requires [installing quarto](https://docs.posit.co/resources/install-quarto.html).
+
+To render the notebooks, run the following command in the terminal:
+
+```bash
+quarto render notebooks
+```
+
+The notebooks can be rendered without a GPU available, but some code chunks will then not be executed.
+
+To serve the website, run the following command in the terminal:
+
+```bash
+quarto serve
+```
+
+Note that rendering the website does not render the notebooks but uses the pre-rendered HTML files in the `notebooks-html` folder.

@@ -422,7 +422,7 @@ This means, for example, that reshaping torch tensors can be considerably more e
 
 The functionality of strides is illustrated in the image below.
 
-![2D Tensor Strides](assets/2D_tensor_strides.png){fig-align="center" width=100%}
+![2D Tensor Strides](../assets/2D_tensor_strides.png){fig-align="center" width=100%}
 Source: [How to Represent a Tensor or ndarray](https://martinlwx.github.io/en/how-to-reprensent-a-tensor-or-ndarray/)
 
 ::: {.callout-note}

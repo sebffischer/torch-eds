@@ -1,12 +1,11 @@
 ---
-title: "Automatic Differentiation with torch"
+title: "Autograd"
 ---
 
 ```{r, include = FALSE}
 set.seed(123)
 torch::torch_manual_seed(123)
 ```
-
 
 # Overview
 
