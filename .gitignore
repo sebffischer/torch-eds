@@ -8,3 +8,4 @@ notebooks/.quarto/
 docs/
 /.quarto/
 notebooks/data
+site_lib/

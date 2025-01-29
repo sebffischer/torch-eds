@@ -1,0 +1,26 @@
+name: Quarto Publish
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          version: 'latest'  # Specify the Quarto version
+
+      - name: Render and Publish
+        uses: quarto-dev/quarto-actions/publish@v2
+        with:
+          target: gh-pages  # Deploy to the gh-pages branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

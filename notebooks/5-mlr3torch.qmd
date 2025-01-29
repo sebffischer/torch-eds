@@ -6,29 +6,21 @@ title: "Training Neural Networks with mlr3torch"
 
 ## Why Use `mlr3torch`?
 
-`mlr3torch` is a package that extends the `mlr3` framework with deep learning capabilities and allows to apply deep learning techniques to both tabular and non-tabular data.
-The package implements many routines common in deep learing and allows to focus on the actual problem at hand.
-Some advantages of using `mlr3torch` over 'only' `torch` are:
+`mlr3torch` is a package that extends the `mlr3` framework with deep learning capabilities, allowing the application of deep learning techniques to both tabular and non-tabular data. The package implements many routines common in deep learning and allows users to focus on the actual problem at hand. Some advantages of using `mlr3torch` over 'only' `torch` are:
 
 - **Less Code**: Avoid writing repetitive boilerplate code by utilizing predefined network architectures or easily building custom ones tailored to your specific needs.
 
-- **mlr3 Integration**: Especially for users that already have experience with the `mlr3` framework, working with `mlr3torch` should feel familiar. Due to the integration into the `mlr3` framework, many `mlr3` features like hyperparameter tuning, preprocessing, and resampling are readily available for `mlr3torch`.
+- **mlr3 Integration**: Especially for users with experience in the `mlr3` framework, working with `mlr3torch` should feel familiar. Due to the integration into the `mlr3` framework, many `mlr3` features like hyperparameter tuning, preprocessing, and resampling are readily available for `mlr3torch`.
 
-However, as `mlr3torch` is a framework, it is less flexible than `torch` itself, so knowing both is recommended.
-Another helpful R package that provides many useful functions to train neural networks is [`luz`](https://mlverse.github.io/luz/).
-
+However, as `mlr3torch` is a framework, it is less flexible than `torch` itself, so knowing both is recommended. Another helpful R package that provides many useful functions to train neural networks is [`luz`](https://mlverse.github.io/luz/).
 
 ## `mlr3` Recap
 
-Before we dive into `mlr3torch`, we will briefly review the core building blocks of the `mlr3` machine learning framework.
-For reference, we recommend the [mlr3 book](https://mlr3book.mlr-org.com/) that explains the `mlr3` framework in more detail.
-Furthermore, there exists the [mlr3 website](https://mlr-org.com/) that contains more tutorials and overviews.
+Before diving into `mlr3torch`, we will briefly review the core building blocks of the `mlr3` machine learning framework. For reference, we recommend the [mlr3 book](https://mlr3book.mlr-org.com/) that explains the `mlr3` framework in more detail. Additionally, the [mlr3 website](https://mlr-org.com/) contains more tutorials and overviews.
 
 ### Task
 
-A task is a machine learning problem on a dataset.
-It consists of the data itself and some metadata such as the features or the target variable.
-In order to create an example task that comes with `mlr3`, we can use the `tsk()` function:
+A task is a machine learning problem on a dataset. It consists of the data itself and some metadata such as the features or the target variable. To create an example task that comes with `mlr3`, we can use the `tsk()` function:
 
 ```{r}
 library(mlr3)
@@ -42,9 +34,8 @@ tsk_iris <- as_task_classif(iris, id = "iris", target = "Species")
 tsk_iris
 ```
 
-
 ::: {.callout-tip}
-To get the help page for an `mlr3` object, you can e.g. call `tsk_iris$help()`.
+To get the help page for an `mlr3` object, you can call `tsk_iris$help()`.
 :::
 
 You can access the data of a task using the `$data()` method, which accepts arguments `rows` and `cols` to select specific rows and columns.
@@ -62,9 +53,7 @@ autoplot(tsk_iris)
 
 ### Learner
 
-A learner is a machine learning algorithm that can be `$train()`ed on a `Task` and `$predict()`ed on a `Task`.
-An overview of all learners is shown on our [website](https://mlr-org.com/learners.html).
-We can construct one by passing the name of the learner to the `lrn()` function.
+A learner is a machine learning algorithm that can be `$train()`ed on a `Task` and `$predict()`ed on a `Task`. An overview of all learners is shown on our [website](https://mlr-org.com/learners.html). We can construct one by passing the name of the learner to the `lrn()` function.
 
 ```{r}
 lrn_tree <- lrn("classif.rpart")
@@ -82,23 +71,20 @@ The trained model can be accessed via the `$model` slot of the learner:
 print(lrn_tree$model)
 ```
 
-In order to make predictions on the test set, we can use the `$predict()` method of the learner:
+To make predictions on the test set, we can use the `$predict()` method of the learner:
 ```{r}
 predictions <- lrn_tree$predict(tsk_iris, row_ids = split$test)
 ```
 
-To make predictions on `data.frame`s we can use the `$predict_newdata()` method of the learner:
+To make predictions on `data.frame`s, we can use the `$predict_newdata()` method of the learner:
 ```{r}
 new_data <- iris[1:2, ]
 lrn_tree$predict_newdata(new_data)
 ```
 
-
 ### Performance Evaluation
 
-In order to assess the quality of the predictions, we can use a `Measure`.
-`mlr3` comes with many predefined measures and we can construct them by passing the name of the measure to the `msr()` function.
-Below, we construct the mean classificiation accuracy measure -- which can only be applied to classification tasks -- and use it to evaluate the predictions.
+To assess the quality of the predictions, we can use a `Measure`. `mlr3` comes with many predefined measures, and we can construct them by passing the name of the measure to the `msr()` function. Below, we construct the mean classification accuracy measure -- which can only be applied to classification tasks -- and use it to evaluate the predictions.
 
 ```{r}
 acc <- msr("classif.acc")
@@ -118,7 +104,6 @@ rr <- resample(
 # Aggregate the results
 rr$aggregate(msr("classif.acc"))
 ```
-
 
 ### Hyperparameter Tuning
 
@@ -164,7 +149,7 @@ Hyperparameter tuning is an essential process in machine learning to optimize th
    msr_tune <- msr("classif.acc")
    ```
 
-1. **Execute Tuning**: Run the tuning process to find the optimal hyperparameters. Here we also specify our budget of 10 evaluations.
+5. **Execute Tuning**: Run the tuning process to find the optimal hyperparameters. Here we also specify our budget of 10 evaluations.
 
    ```{r}
    tune_result <- tune(
@@ -185,13 +170,12 @@ Hyperparameter tuning is an essential process in machine learning to optimize th
    lrn_tree$train(tsk_iris)
    ```
 
-
 ::: {.callout-note}
-## Quiz: Tuning Performace
+## Quiz: Tuning Performance
 
 Question 1: Estimating the performance of a tuned model:
 
-Through the tuning archive, we can access the performance of the best found hyperparameter configuration.
+Through the tuning archive, we can access the performance of the best-found hyperparameter configuration.
 
 ```{r}
 tune_result$archive$data[order(classif.acc, decreasing = TRUE), ][1, classif.acc]
@@ -201,10 +185,10 @@ Do you think this is a good estimate for the performance of the final model? Exp
 
 <details>
 <summary>Click for answer</summary>
-One reason why we would expect the performance of the final model to be worse than the performance of the best found hyperparameter configuration is due to *optimization bias*:
+One reason why we would expect the performance of the final model to be worse than the performance of the best-found hyperparameter configuration is due to *optimization bias*:
 We choose the model configuration with the highest validation performance.
 This selection process biases the result since the chosen model is the best among several trials.
-To illustrate this, imageine that we take the maximum of 10 random numbers drawn from a normal distribution with mean 0.
+To illustrate this, imagine that we take the maximum of 10 random numbers drawn from a normal distribution with mean 0.
 The maximum over those numbers is larger than $0$, even though this is the mean of the generating distribution.
 
 ```{r, echo = FALSE}
@@ -232,7 +216,7 @@ at <- auto_tuner(
 ```
 
 The `AutoTuner` can be used just like any other `Learner`.
-In order to get a valid performance estimte of the tuning process, we can `resample()` it on the task.
+To get a valid performance estimate of the tuning process, we can `resample()` it on the task.
 This is called *nested resampling*: the outer resampling is for evaluation and the inner resampling is for tuning.
 
 ```{r}
@@ -240,11 +224,10 @@ rr <- resample(tsk_iris, at, rsmp_tune)
 rr$aggregate()
 ```
 
-
 ### Learning Pipelines
 
-In many cases we don't only fit a single learner, but a whole learning pipeline.
-Common use cases include the preprocessing of the data, e.g. for imputing missing values, scaling the data or encoding categorical features, but many other operations are possible.
+In many cases, we don't only fit a single learner but a whole learning pipeline.
+Common use cases include the preprocessing of the data, e.g., for imputing missing values, scaling the data, or encoding categorical features, but many other operations are possible.
 The `mlr3` extension `mlr3pipelines` is a toolbox for defining such learning pipelines.
 Its core building block is the `PipeOp` that can be constructed using the `po()` function.
 
@@ -253,7 +236,7 @@ library(mlr3pipelines)
 pca <- po("pca")
 ```
 
-Just like a learner, it has a `$train()` and `$predict()` method and we can apply it to a `Task` using the `$train()` and `$predict()` methods.
+Just like a learner, it has a `$train()` and `$predict()` method, and we can apply it to a `Task` using these methods.
 
 ```{r}
 pca$train(list(tsk_iris))
@@ -277,7 +260,6 @@ glrn <- as_learner(graph)
 glrn$train(tsk_iris)
 ```
 
-
 ## Brief Introduction to `mlr3torch`
 
 `mlr3torch` builds upon the same components as `mlr3`, only that we use Deep `Learner`s, and can also work on non-tabular data.
@@ -297,7 +279,7 @@ lrn_mlp <- lrn("classif.mlp",
 )
 ```
 
-This multi layer perceptron can be used just like the classification tree above.
+This multi-layer perceptron can be used just like the classification tree above.
 
 ```{r}
 lrn_mlp$train(tsk_iris, row_ids = split$train)
@@ -309,7 +291,7 @@ The trained `nn_module` can be accessed via the `$model` slot of the learner:
 lrn_mlp$model$network
 ```
 
-Besides the trained network, the `$model` of the learner e.g. also contains the `$state_dict()` of the optimizer and other information.
+Besides the trained network, the `$model` of the learner also contains the `$state_dict()` of the optimizer and other information.
 
 Having trained the neural network on the training set, we can now make predictions on the test set:
 
@@ -348,7 +330,7 @@ In the `mlr3` machine learning framework, this can be easily done by specifying 
 Note that this is not possible for all `Learner`s, but only for those with the `"validation"` property.
 This includes boosting algorithms such as XGBoost or CatBoost, and also the `mlr3torch` learners.
 
-Below, we set the validation ratio to 30% of the training data, specify the measures to record and set the callbacks of the learner to record the history of the training process.
+Below, we set the validation ratio to 30% of the training data, specify the measures to record, and set the callbacks of the learner to record the history of the training process.
 
 ```{r}
 lrn_mlp$configure(
@@ -360,13 +342,11 @@ lrn_mlp$configure(
 )
 ```
 
-
 :::{.callout-tip}
-The `$configure()` method of a `Learner` allows to simultanteously set fields and hyperparameters of a learner.
+The `$configure()` method of a `Learner` allows you to simultaneously set fields and hyperparameters of a learner.
 :::
 
-When we now train the learner, 30% of the training data is used for validation and the loss is recorded in the history of the learner.
-
+When we now train the learner, 30% of the training data is used for validation, and the loss is recorded in the history of the learner.
 
 ```{r}
 lrn_mlp$train(tsk_iris)
@@ -384,13 +364,12 @@ Additionally, the final validation scores can be accessed via the `$internal_val
 lrn_mlp$internal_valid_scores
 ```
 
-
 ### Defining a Custom Torch Learner
 
-`mlr3torch` also allows to define custom architectures by assembling special `PipeOp`s in a `Graph`.
+`mlr3torch` also allows defining custom architectures by assembling special `PipeOp`s in a `Graph`.
 As a starting point in the graph, we need to mark the entry of the Neural Network using an ingress pipeop.
 Because we are working with a task with only one numeric feature, we can use `po("torch_ingress_num")`.
-There also exists inputs for categorical features (`po("torch_ingress_cat")`) and generic tensors (`po("torch_ingress_ltnsr")`).
+There also exist inputs for categorical features (`po("torch_ingress_cat")`) and generic tensors (`po("torch_ingress_ltnsr")`).
 
 ```{r}
 ingress <- po("torch_ingress_num")
@@ -408,7 +387,7 @@ architecture <- po("nn_linear_1", out_features = 100) %>>%
 architecture$plot(horizontal = TRUE)
 ```
 
-After specifying the architecture, we need to set the remaining parts for the learner, which are the loss, optimizer and the remaining training confguration such as the epochs, device or the batch size.
+After specifying the architecture, we need to set the remaining parts for the learner, which are the loss, optimizer, and the remaining training configuration such as the epochs, device, or the batch size.
 
 ```{r}
 graph <- ingress %>>% architecture %>>%
@@ -427,9 +406,9 @@ glrn$train(tsk_iris, row_ids = split$train)
 ### Working with Non-Tabular Data
 
 In the `mlr3` ecosystem, the data of a task is always stored in a `data.frame` or `data.table`.
-In order to be able to work with non-tabular data, the `mlr3torch` package offers a custom datatype, the `lazy_tensor`, which can stored in a `data.table`.
+To work with non-tabular data, the `mlr3torch` package offers a custom datatype, the `lazy_tensor`, which can be stored in a `data.table`.
 
-As an example to showcast this, we can use the CIFAR-10 dataset, which is a dataset of 60,000 32x32 color images in 10 classes, with 6,000 images per class.
+As an example to showcase this, we can use the CIFAR-10 dataset, which is a dataset of 60,000 32x32 color images in 10 classes, with 6,000 images per class.
 
 ```{r}
 tsk_cifar <- tsk("cifar10")
@@ -441,7 +420,7 @@ The image below shows some examples from the dataset:
 ![](images/cifar10.jpg)
 
 :::{.callout-tip}
-In order to avoid having to re-download the dataset every time, you can set the `mlr3torch.cache` option to `TRUE`.
+To avoid having to re-download the dataset every time, you can set the `mlr3torch.cache` option to `TRUE`.
 ```{r, eval = FALSE}
 options(mlr3torch.cache = TRUE)
 ```
@@ -454,20 +433,20 @@ tsk_cifar$head()
 ```
 
 A `lazy_tensor` column can be compared to the `torch::dataset` class that we have seen earlier.
-This means, it does not necessarily store the data in memory, but only stores the information how to load the data.
+This means it does not necessarily store the data in memory, but only stores the information on how to load the data.
 
 ```{r}
 image_vec <- tsk_cifar$data(cols = "image")[[1L]]
 head(image_vec)
 ```
 
-In order to access the data as `torch_tensor`s, we can call the `materialize()` function:
+To access the data as `torch_tensor`s, we can call the `materialize()` function:
 
 ```{r}
 image_tensor <- materialize(image_vec)[[1L]]
 ```
 
-To construct the cifar10 task ourselves, we need to first:
+To construct the CIFAR-10 task ourselves, we need to first:
 
 1. Construct a `torch::dataset` that returns the images as `torch_tensor`s.
 2. Create a `factor()` vector that contains the labels.
@@ -481,8 +460,8 @@ image_array <- cifar10_original$x
 str(image_array)
 ```
 
-The array contains 50 000 images (rows) of shape `32x32x3`.
-The last dimension contains the channels, i.e. the RGB values of the pixels.
+The array contains 50,000 images (rows) of shape `32x32x3`.
+The last dimension contains the channels, i.e., the RGB values of the pixels.
 We reshape this so the channel dimension is the first dimension, which is the standard format for images in `torch`.
 
 ```{r}
@@ -491,7 +470,7 @@ dim(image_array)
 ```
 
 Next, we create a `torch::dataset()` that loads individual images as a `torch_tensor`.
-In order to convert this to a `lazy_tensor` later, the `$.getitem()` method needs to return a named list.
+To convert this to a `lazy_tensor` later, the `$.getitem()` method needs to return a named list.
 
 ```{r}
 dataset_cifar10 <- dataset("cifar10",
@@ -520,7 +499,7 @@ str(cifar10$.getitem(1))
 ```
 
 To convert this to a `lazy_tensor`, we can use the `as_lazy_tensor()` function.
-The only thing we need to specify are the output shapes of the tensors, which we set to `c(NA, 3, 32, 32)`.
+The only thing we need to specify is the output shapes of the tensors, which we set to `c(NA, 3, 32, 32)`.
 The `NA` is used to indicate that the first dimension (batch dimension) can be of any size.
 
 ```{r}
@@ -528,13 +507,12 @@ cifar10_lt <- as_lazy_tensor(cifar10, dataset_shapes = list(image = c(NA, 3, 32,
 head(cifar10_lt)
 ```
 
-
 :::{.callout-tip}
-To check that transformations on images were applied correctly, it can be useful to inspect the images, e.g. using `torchvision::tensor_image_browse()`.
+To check that transformations on images were applied correctly, it can be useful to inspect the images, e.g., using `torchvision::tensor_image_browse()`.
 :::
 
 Next, we create the `factor` vector that contains the labels.
-For that we use the data stored in the original `torchvision::cifar10_dataset()` object.
+For that, we use the data stored in the original `torchvision::cifar10_dataset()` object.
 
 ```{r}
 labels <- factor(cifar10_original$y, labels = cifar10_original$classes[1:10])
@@ -555,8 +533,7 @@ tsk_cifar <- as_task_classif(cifar10_dt, id = "cifar10", target = "label")
 tsk_cifar
 ```
 
-
-We will now try to train a simple multi layer perceptron -- the one we have defined above -- on the images.
+We will now try to train a simple multi-layer perceptron -- the one we have defined above -- on the images.
 One problem that we have is that the images are of shape `32x32x3`, but the `nn_linear` layer expects a flat input of size `3072` (32 * 32 * 3).
 
 This is where the `lazy_tensor` datatype comes in handy.
@@ -569,7 +546,7 @@ tsk_cifar_flat <- reshaper$train(list(tsk_cifar))[[1L]]
 tsk_cifar_flat$head()
 ```
 
-Note that this transformation is not applied eagerily, but only when the data is actually loaded.
+Note that this transformation is not applied eagerly, but only when the data is actually loaded.
 
 :::{.callout-note}
 In this case, as all the images are stored in memory, we could have also applied the transformation directly to the `array` representing the images, but decided not to do this for demonstration purposes.
@@ -613,12 +590,11 @@ glrn_with_flattening$param_set$set_values(torch_model_classif.epochs = 0)
 glrn_with_flattening$train(tsk_cifar)
 ```
 
-
 ### Saving an `mlr3torch` Learner
 
-We have seen earlier, that torch tensors cannot simply be saved using `saveRDS()`.
+We have seen earlier that torch tensors cannot simply be saved using `saveRDS()`.
 The same also applies to the `mlr3torch` learners.
-In order to be able to save an `mlr3torch` learner, we need to call the `$marshal()` method first.
+To save an `mlr3torch` learner, we need to call the `$marshal()` method first.
 
 ```{r}
 pth <- tempfile(fileext = ".rds")
@@ -626,7 +602,7 @@ glrn_with_flattening$marshal()
 saveRDS(glrn_with_flattening, pth)
 ```
 
-Afterwards, we can load the learner again using `readRDS()` and the `$unmarshal()` method.
+Afterward, we can load the learner again using `readRDS()` and the `$unmarshal()` method.
 
 ```{r}
 glrn_with_flattening <- readRDS(pth)

@@ -2,15 +2,12 @@
 title: "Training Efficiency"
 ---
 
-```{r, include = FALSE}
-set.seed(123)
-torch::torch_manual_seed(123)
-```
+{{< include _setup.qmd >}}
 
-Methods for increasing training efficiency can be roughtly split up into:
+Methods for increasing training efficiency can be roughly split into:
 
-1. Computational methods such as jit compilation, using GPU, parallel data loading, etc. that allow doing the same thing **faster**.
-2. Methodological approaches that change how we approach the modeling to get either better results or faster training.
+1. Computational methods such as JIT compilation, using GPU, parallel data loading, etc., that allow doing the same thing **faster**.
+2. Methodological approaches that change how we approach modeling to achieve either better results or faster training.
 
 # Computational Approaches
 
@@ -36,7 +33,6 @@ backends_mps_is_available()
 ```
 :::
 
-
 To demonstrate the speed improvements obtained by using a GPU, we conduct a large matrix operation on a GPU and a CPU.
 We start by randomly sampling a matrix of size 1000x1000.
 
@@ -56,29 +52,26 @@ bench::mark(
 )
 ```
 
-
 ### CPU Threads
 
 Training large networks on a CPU is not a recommended approach, but it can be useful for smaller networks or when you don't have a GPU.
 You can still use multiple threads to speed up the execution of operations.
-Note that the code below will not run on MacOS, as it is not possible to set the number of threads on MacOS.
+Note that the code below will not run on macOS, as it is not possible to set the number of threads on macOS.
 
 ```{r eval = (Sys.info()["sysname"] != "Darwin")}
-# this will be skipped on MacOS
+# this will be skipped on macOS
 bench::mark(
   {torch_set_num_threads(1L); x_cpu$matmul(x_cpu)},
   {torch_set_num_threads(16L); x_cpu$matmul(x_cpu)}
 )
 ```
 
-
-`torch` also allows for interop-parallelization, but this is is more advanced and code needs to be written in a specific way.
+`torch` also allows for interop-parallelization, but this is more advanced and code needs to be written in a specific way.
 
 :::{.callout-note}
 ## Quiz: Number of Threads
 
 Question 1: On a CPU with 4 cores, does it make sense to set the number of threads to values greater than 4? Explain your answer.
-
 
 <details>
 <summary>Click for answer</summary>
@@ -104,11 +97,11 @@ The optimal number of threads is a trade-off between these two effects.
 Besides speeding up the computation of operations in the forward and backward pass, another possible bottleneck is the loading of data.
 There are various ways to improve data loading speed:
 
-1. Improve implementation of the `dataset` class
-2. Parallelizing the data loading process
-3. Moving data to the GPU
+1. Improve the implementation of the `dataset` class
+2. Parallelize the data loading process
+3. Move data to the GPU
 
-Both of these approaches will now be discussed.
+These approaches will now be discussed.
 
 ### Efficient Dataset Implementation
 
@@ -120,7 +113,7 @@ When implementing a dataset, we need to define:
 :::{.callout-note}
 ## Quiz: Data Loading
 
-The *tiny imagenet* dataset is a dataset of 100 000 images of size 64x64x3.
+The *tiny imagenet* dataset is a dataset of 100,000 images of size 64x64x3.
 It is a subset of the famous *imagenet* dataset.
 Below, we show some examples from the dataset:
 
@@ -141,13 +134,12 @@ str(image_paths)
 str(image_array)
 ```
 
-An individual image can e.g. be loaded using the `torchvision::base_loader()` function:
+An individual image can, for example, be loaded using the `torchvision::base_loader()` function:
 
 ```{r}
 library(torchvision)
 str(base_loader(image_paths[1]))
 ```
-
 
 **Question 1:** Reading From Disk or RAM
 
@@ -210,7 +202,6 @@ bench::mark(
 
 </details>
 
-
 **Question 2:** (Don't) Copy that
 
 Consider now the next dataset implementation:
@@ -264,12 +255,11 @@ ds_tensor_batch = dataset("tensor_batch",
 )(image_array)
 ```
 
-
 <details>
 <summary>Click for answer</summary>
 The `$.getbatch()` implementation is faster than the `$.getitem()` implementation.
 This is because when using the `$.getitem()` method, the batch for indices `ids` is obtained by calling `$.getitem(id)` for each index in `ids` and then stacking them together, which requires a new tensor allocation.
-Slicing the tensor however avoids this allocation when `shuffle = TRUE` (which is also the default).
+Slicing the tensor, however, avoids this allocation when `shuffle = TRUE` (which is also the default).
 
 ```{r}
 bench::mark(
@@ -283,7 +273,7 @@ bench::mark(
 
 ### Parallel Data Loading
 
-In Deep Learning, datasets can be very large and it might therefore be the case that the data is simply too large to fit into memory.
+In Deep Learning, datasets can be very large, and it might therefore be the case that the data is simply too large to fit into memory.
 In this case, we can use parallel data loading to speed up the data loading process.
 Instead of loading the data sequentially in the main process, other R processes will be started that execute the data loading.
 For example, if we set `num_workers = 4L`, 4 R processes will be started that load the data, while the main process is free to train the model.
@@ -297,20 +287,18 @@ Creating such a parallel dataloader is as easy as setting the `num_workers` para
 :::{.callout-note}
 Note that there is some communication overhead that results from sending the batches from the worker to the main process.
 This will hopefully be reduced in the future, but is currently there.
-For this reason, parallel data loading is therefore -- currently -- only beneficial when it is slow, e.g. because of loading the data from disk or because of expensive preprocessing.
+For this reason, parallel data loading is therefore -- currently -- only beneficial when it is slow, e.g., because of loading the data from disk or because of expensive preprocessing.
 :::
 
 ### Moving Data to the GPU
 
-
 One thing we have ignored so far is that when training using a GPU, the data needs to be moved to the GPU.
-This is because a GPU has its own memory (VRAM) and the data needs to be moved to this memory before it can be used for training.
-The moving of the data to the GPU cannot be done on the processes that are loading the data but must be done in the main process, i.e. after the batch was received from (possibly parallelized) dataloader.
+This is because a GPU has its own memory (VRAM), and the data needs to be moved to this memory before it can be used for training.
+The moving of the data to the GPU cannot be done on the processes that are loading the data but must be done in the main process, i.e., after the batch was received from (possibly parallelized) dataloader.
 One way to speed up the data loading process is to pin the memory of the data to the GPU.
-Before a tensor can be moved from RAM to VRAM, it needs to be in so-called page-locked memory which can be done using the `pin_memory` parameter.
+Before a tensor can be moved from RAM to VRAM, it needs to be in so-called page-locked memory, which can be done using the `pin_memory` parameter.
 
 ![](../assets/pinned-memory.png)
-
 
 ```{r, eval = cuda_is_available()}
 iter_cuda = function(ds, pin_memory = TRUE) {
@@ -326,20 +314,18 @@ bench::mark(
 )
 ```
 
-
 :::{.callout-note}
 
-In order to use parallel data loading or memory pinning with `mlr3torch`, these parameters can simple be specified in the learner:
+In order to use parallel data loading or memory pinning with `mlr3torch`, these parameters can simply be specified in the learner:
 
 ```{r}
 lrn("classif.mlp", num_workers = 8L, pin_memory = TRUE, device = "cuda")
 ```
 :::
 
+## JIT Compilation & Ignite Optimizers
 
-## Jit Compilation & Ignite Optimizers
-
-Some special care needs to be taken when using `torch` (or `mlr3torch`) in order to get a good performance.
+Some special care needs to be taken when using `torch` (or `mlr3torch`) in order to get good performance.
 In the future, this will hopefully not be necessary anymore, but is currently required.
 
 ### 'Ignite' Optimizers
@@ -375,23 +361,21 @@ bench::mark(
 )
 ```
 
-
-### Jit Compilation
+### JIT Compilation
 
 JIT (Just-In-Time) compilation is a runtime optimization technique that compiles code into machine code during execution rather than beforehand.
 This has different advantages:
 
-1. By jit-compiling a model, some operations can be optimized for performance.
-2. A jit-compiled model can be saved and executed without an R dependency for deployment (only LibTorch is required), e.g. in a C++ application.
-3. Running a jit-compiled model in R is faster because the whole network is executed in C++ instead of R.
+1. By JIT-compiling a model, some operations can be optimized for performance.
+2. A JIT-compiled model can be saved and executed without an R dependency for deployment (only LibTorch is required), e.g., in a C++ application.
+3. Running a JIT-compiled model in R is faster because the whole network is executed in C++ instead of R.
 
-In `torch`, this can either be done using using TorchScript or by tracing a model.
-We will briefly discuss both approaches, but for more infromation see the [torch documentation](https://torch.mlverse.org/docs/articles/torchscript).
-
+In `torch`, this can either be done using TorchScript or by tracing a model.
+We will briefly discuss both approaches, but for more information, see the [torch documentation](https://torch.mlverse.org/docs/articles/torchscript).
 
 #### TorchScript
 
-TorchScript is a subset of Python -- i.e. its own programming language -- that can be used to define compiled functions.
+TorchScript is a subset of Python -- i.e., its own programming language -- that can be used to define compiled functions.
 In R, this is available via the [`jit_compile`](https://torch.mlverse.org/docs/reference/jit_compile.html) function.
 
 ```{r}
@@ -410,7 +394,7 @@ str(out)
 
 Besides syntax, there are some important differences between TorchScript and R:
 
-1. In TorchScript, indexing tensors is 0-based and
+1. In TorchScript, indexing tensors is 0-based, and
 2. TorchScript is statically typed, so you need to specify the types of the arguments, unless they are tensors, which is the default.
 
 Below, we define a function that takes a list of tensors and calculates their sum.
@@ -429,7 +413,7 @@ sum_jit(list(torch_randn(1), torch_randn(1)))
 
 #### Tracing
 
-The alternative to writing TorchScript is to write your module in R and to use use [`jit_trace`](https://torch.mlverse.org/docs/reference/jit_trace_module.html) to compile it.
+The alternative to writing TorchScript is to write your module in R and to use [`jit_trace`](https://torch.mlverse.org/docs/reference/jit_trace_module.html) to compile it.
 ```{r}
 f2 = function(x, w, bias) {
   x$matmul(w) + bias
@@ -441,7 +425,7 @@ out2 = f2(x, w, bias)
 torch_equal(out, out2)
 ```
 
-An advantage of trace-compilation is that it even allows to jit-compile modules, which is currently not possible with `jit_compile`.
+An advantage of trace-compilation is that it even allows you to JIT-compile modules, which is currently not possible with `jit_compile`.
 
 ```{r}
 net = nn_sequential(
@@ -454,13 +438,13 @@ net_jit = jit_trace(net, torch_randn(10, 10))
 torch_equal(net(x), net_jit(x))
 ```
 
-Trace-compilation is restrictive because it only records operations appplied to torch tensors and is unaware of R control flow, so you need to be careful when using it.
+Trace-compilation is restrictive because it only records operations applied to torch tensors and is unaware of R control flow, so you need to be careful when using it.
 Furthermore, it only accepts torch tensors as arguments.
 Unless you have dynamic inputs and outputs or modify the configuration of the module, trace-compilation should usually work.
 You can also check this by running the original and trace-jitted module on some example inputs and see if they return the same result.
 
 :::{.callout-note}
-A trace-jitted module *does* respect the mode of the network, i.e. whether it is training or evaluating.
+A trace-jitted module *does* respect the mode of the network, i.e., whether it is training or evaluating.
 :::
 
 In `mlr3torch`, trace compilation is also available and can be enabled by setting `jit_trace = TRUE` in the learner.
@@ -521,7 +505,7 @@ fjit(torch_tensor(2), torch_tensor(3), torch_tensor(FALSE))
 
 Another way to speed up the training process is to use mixed precision training.
 This technique involves training the model using both 16-bit and 32-bit floating point numbers.
-This allows to reduce the memory footprint of the model and to speed up the training process.
+This allows reducing the memory footprint of the model and speeding up the training process.
 
 We won't cover this here, but refer to the [torch documentation](https://torch.mlverse.org/docs/articles/amp) that explains how to do this.
 
@@ -531,15 +515,15 @@ We won't cover this here, but refer to the [torch documentation](https://torch.m
 
 For more details on this topic, see the [corresponding chapter](https://mlr3book.mlr-org.com/chapters/chapter15/predsets_valid_inttune.html) in the `mlr3` book.
 
-As we have already seen in one of the previous notebooks, in deep learning one often some part of the data is used for validation purposes.
-This allows to monitor the performance of the model on unseen data.
+As we have already seen in one of the previous notebooks, in deep learning, some part of the data is often used for validation purposes.
+This allows monitoring the performance of the model on unseen data.
 
 In `mlr3torch`, we can track the performance of the model on a validation set by specifying:
 
 * `validate`, which is the ratio of the data that is used for validation
 * `measures_valid`, which is a list of measures to use for validation
 * `eval_freq`, which is the frequency at which the validation is performed
-* `callbacks`, which is a list of callbacks to use during training, in this case we use the `history` callback, which records the performance of the model on the validation set at regular intervals, enabling us to monitor and analyze the model's performance over time.
+* `callbacks`, which is a list of callbacks to use during training, in this case, we use the `history` callback, which records the performance of the model on the validation set at regular intervals, enabling us to monitor and analyze the model's performance over time.
 
 :::{.callout-tip}
 While `mlr3torch` comes with predefined callbacks, it is also possible to define custom callbacks that modify the training process.
@@ -556,7 +540,7 @@ mlp_learner = lrn("classif.mlp",
   validate = 0.3, # how much data to use for validation
   measures_valid = msr("classif.logloss"), # how to evaluate train performance
   measures_train = msr("classif.logloss"), # how to evaluate validation performance
-  callbacks = t_clbk("history"), # history callbacks saves train and validation performance
+  callbacks = t_clbk("history"), # history callbacks save train and validation performance
   eval_freq = 10 # after how many training epochs to perform validation
 )
 mlp_learner$train(task)
@@ -571,7 +555,7 @@ Below we plot the training and validation for the different epochs:
 library(ggplot2)
 ggplot(history_df, aes(x = epoch)) +
   geom_line(aes(y = train.classif.logloss, color = "Training Loss")) +
-  geom_line(aes(y = valid.calssif.logloss, color = "Validation Loss")) +
+  geom_line(aes(y = valid.classif.logloss, color = "Validation Loss")) +
   labs(title = "MLP Training and Validation Loss Over Epochs",
        x = "Epoch",
        y = "Log-Loss") +
@@ -582,7 +566,7 @@ ggplot(history_df, aes(x = epoch)) +
 ```
 
 Instead of only monitoring the validation loss (and watching it get worse and worse), we can also stop the training process dynamically when the validation loss begins to increase.
-This regularization technique is called early stopping and it prevents overfitting during the training of iteratively trained machine learning models.
+This regularization technique is called early stopping, and it prevents overfitting during the training of iteratively trained machine learning models.
 It involves monitoring the validation loss during training and stopping the training process when the validation loss begins to increase, indicating that the model is starting to overfit the training data.
 
 The key configuration option for early stopping is the `patience` parameter, which defines the number of epochs to wait after the last improvement in validation loss before stopping the training. For example, if patience is set to 10, the training will continue for 10 additional epochs after the last observed improvement in validation loss. If no improvement is seen during this period, training will be halted.
@@ -602,9 +586,8 @@ mlp_learner$train(task)
 mlp_learner$internal_tuned_values$epochs
 ```
 
-Beyond only tuning the number of epochs, `mlr3`'s internal tuning mechanism also allows to tune the number of epochs internally while using an offline tuning method to optimize other hyperparameters.
+Beyond only tuning the number of epochs, `mlr3`'s internal tuning mechanism also allows tuning the number of epochs internally while using an offline tuning method to optimize other hyperparameters.
 To use this, we can set the parameters we want to tune `TuneTokens`:
-
 
 ```{r, message = FALSE}
 library(mlr3tuning)
@@ -625,7 +608,7 @@ Unless there is a specific reason to design a new architecture, it is recommende
 :::{.callout-note}
 Because the Python deep learning ecosystem is so large, many more architectures are implemented in Python than in R.
 One way to use them in R is to simply translate the PyTorch code to (R-)torch.
-While PyTorch and (R-)torch are quite similar, there are some differences, e.g. 1-based and 0-based indexing.
+While PyTorch and (R-)torch are quite similar, there are some differences, e.g., 1-based and 0-based indexing.
 The `torch` website contains a [brief tutorial](https://torch.mlverse.org/docs/articles/python-to-r) on how to do this.
 :::
 
@@ -651,7 +634,7 @@ where:
 
 During inference, the module uses the running mean and variance of the training data to normalize the input.
 
-In `torch`, different versions of batch normalization exists for different dimensions of the input tensor.
+In `torch`, different versions of batch normalization exist for different dimensions of the input tensor.
 Below, we illustrate the batch normalization module using a 1D input tensor (the batch dimension does not count here)
 
 ```{r}
@@ -660,27 +643,24 @@ bn = nn_batch_norm1d(num_features = 5)
 bn(x)
 ```
 
-
 :::{.callout-note}
 ## Quiz: Batch Normalization
 
-**Question 1**: Earlier we have learned that `nn_module`s have buffers and parameters, where the latter are learnerd with gradient descent.
+**Question 1**: Earlier we have learned that `nn_module`s have buffers and parameters, where the latter are learned with gradient descent.
 Do you think the mean and variance are parameters or buffers?
 
 <details>
 <summary>Click for answer</summary>
-They are both buffers as they only store the variance and running mean of all training samples seen, i.e. they are not updated using gradient information.
+They are both buffers as they only store the variance and running mean of all training samples seen, i.e., they are not updated using gradient information.
 </details>
 
-
 **Question 2**: Training vs. Evaluation Mode:
-While many `nn_module`s behave the same way irrespective of their mode, batch normalization is an example of a module that behaves differently during training and evaluation, i.e.
+While many `nn_module`s behave the same way irrespective of their mode, batch normalization is an example of a module that behaves differently during training and evaluation, i.e.,
 during training, the module uses the mean and variance of the current batch, while during evaluation, it uses the running mean and variance of all training samples seen.
 
 ```{r}
 bn(x[1:10, ])
 ```
-
 
 Which of the following statements is true and why?
 
@@ -703,19 +683,18 @@ equal2 = torch_equal(
 c(equal1, equal2)
 ```
 
-The first statement is true, because in evaluation mode, the module uses the running mean and variance of all training samples seen.
-The second statemnt is false, because the first tensor uses different means and variances for rows 1-2 and 3-4, while the second tensor uses the same mean and variance for all rows.
+The first statement is true because, in evaluation mode, the module uses the running mean and variance of all training samples seen.
+The second statement is false because the first tensor uses different means and variances for rows 1-2 and 3-4, while the second tensor uses the same mean and variance for all rows.
 </details>
 :::
 
-To illustrate its effectiveness, we will define a simple CNN, with and without batch normalization, train it on CIFAR-10 and compare their performance.
+To illustrate its effectiveness, we will define a simple CNN, with and without batch normalization, train it on CIFAR-10, and compare their performance.
 
-To build the neural networks, we will use `mlr3torch`, which allows to build architectures from `PipeOp`s.
-This makes the creation of network architectures easier, as we e.g. don't have to specify auxiliary parameters (such as the input dimension of a linear layer).
-Recall that the `po("torch_ingress_ltnsr")` is a special `PipeOp` that that marks the input of the neural network.
+To build the neural networks, we will use `mlr3torch`, which allows building architectures from `PipeOp`s.
+This makes the creation of network architectures easier, as we, e.g., don't have to specify auxiliary parameters (such as the input dimension of a linear layer).
+Recall that the `po("torch_ingress_ltnsr")` is a special `PipeOp` that marks the input of the neural network.
 Note that `po("nn_relu_1")` is equivalent to `po("nn_relu", id = "nn_relu_1")`.
 We need to specify unique ID parameters as this is required in `mlr3pipelines`.
-
 
 ```{r}
 cnn_bn = po("torch_ingress_ltnsr") %>>%
@@ -770,7 +749,6 @@ design = benchmark_grid(
 design
 ```
 
-
 ```{r, eval = cuda_is_available()}
 bmr = benchmark(design)
 bmr$aggregate()
@@ -824,7 +802,6 @@ bmr = c(bmr, bmr2)
 autoplot(bmr)
 ```
 
-
 :::{.callout-note}
 ## Quiz: Dropout
 
@@ -836,7 +813,6 @@ Not necessarily, as dropout is a regularization technique that prevents overfitt
 It's goal is to reduce the generalization performance of the model.
 </details>
 :::
-
 
 ## Transfer Learning
 
