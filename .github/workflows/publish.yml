@@ -12,8 +12,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: quarto-dev/quarto-actions/setup@v2
-
       - name: Deploy
         if: ${{ github.event_name == 'push' }}
         uses: JamesIves/github-pages-deploy-action@v4
@@ -21,5 +19,5 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: 'deploy website'
           branch: gh-pages
-          folder: docs
+          folder: .
           single-commit: true
