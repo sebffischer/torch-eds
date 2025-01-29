@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Tensors – Deep Learning with torch in R</title>
+<title>Setup Guide :card_index_dividers: – Deep Learning with torch in R</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -101,35 +101,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 </head>
 
@@ -151,7 +122,7 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../notebooks/setup-guide.html"> 
+    <a class="nav-link active" href="../notebooks/setup-guide.html" aria-current="page"> 
 <span class="menu-text">Setup</span></a>
   </li>  
   <li class="nav-item dropdown ">
@@ -286,7 +257,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Tensors</h1>
+<h1 class="title">Setup Guide :card_index_dividers:</h1>
 </div>
 
 
@@ -303,170 +274,32 @@ window.Quarto = {
 </header>
 
 
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>To solve these exercises, consulting the <code>torch</code> <a href="https://torch.mlverse.org/docs/reference/">function reference</a> can be helpful.</p>
-</div>
-</div>
-<p><strong>Question 1</strong>: Tensor creation and manipulation</p>
-<p>Recreate this torch tensor:</p>
-<div class="cell" data-layout-align="center">
-<div class="cell-output cell-output-stdout">
-<pre><code>torch_tensor
- 1  2  3
- 4  5  6
-[ CPULongType{2,3} ]</code></pre>
-</div>
-</div>
-<details>
-<summary>
-Hint
-</summary>
-First create an R <code>matrix</code> and then convert it using <code>torch_tensor()</code>.
-</details>
-<p>Next, create a view of the tensor so it looks like this:</p>
-<div class="cell" data-layout-align="center">
-<div class="cell-output cell-output-stdout">
-<pre><code>torch_tensor
- 1  2
- 3  4
- 5  6
-[ CPULongType{3,2} ]</code></pre>
-</div>
-</div>
-<details>
-<summary>
-Hint
-</summary>
-Use the <code>$view()</code> method and pass the desired shape as a vector.
-</details>
-<p>How can you check programmatically that you successfully created a view, and not a copy (i.e.&nbsp;changing one does change the other)?</p>
-<details>
-<summary>
-Hint
-</summary>
-See what happens when you modify one of the tensors.
-</details>
-<p><strong>Question 2</strong>: More complex reshaping</p>
-<p>Consider the following tensor:</p>
-<div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">torch_tensor</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>torch_tensor
- 1
- 2
- 3
- 4
- 5
- 6
-[ CPULongType{6} ]</code></pre>
-</div>
-</div>
-<p>Reshape it so it looks like this.</p>
-<div class="cell" data-layout-align="center">
-<div class="cell-output cell-output-stdout">
-<pre><code>torch_tensor
- 1  3  5
- 2  4  6
-[ CPULongType{2,3} ]</code></pre>
-</div>
-</div>
-<details>
-<summary>
-Hint
-</summary>
-First reshape to <code>(2, 3)</code> and then <code>$permute()</code> the two dimensions.
-</details>
-<p><strong>Question 3</strong>: Broadcasting</p>
-<p>Consider the following vectors:</p>
-<div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>x1 <span class="ot">&lt;-</span> <span class="fu">torch_tensor</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>x1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>torch_tensor
- 1
- 2
-[ CPUFloatType{2} ]</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>x2 <span class="ot">&lt;-</span> <span class="fu">torch_tensor</span>(<span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">7</span>))</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>x2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>torch_tensor
- 3
- 7
-[ CPUFloatType{2} ]</code></pre>
-</div>
-</div>
-<p>Predict the result (shape and values) of the following operation by applying the broadcasting rules.</p>
-<div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>x1 <span class="sc">+</span> x2<span class="sc">$</span><span class="fu">reshape</span>(<span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p><strong>Question 4</strong>: Handling Singleton dimensions</p>
-<p>A common operation in deep learning is to add or get rid of singleton dimensions, i.e., dimensions of size 1. As this is so common, torch offers a <a href="https://torch.mlverse.org/docs/reference/torch_squeeze.html"><code>$squeeze()</code></a> and <a href="https://torch.mlverse.org/docs/reference/torch_squeeze.html"><code>$unsqueeze()</code></a> method to add and remove singleton dimensions.</p>
-<p>Use these two functions to first remove the second dimension and then add one in the first position.</p>
-<div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">torch_randn</span>(<span class="dv">2</span>, <span class="dv">1</span>)</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>torch_tensor
--0.1115
- 0.1204
-[ CPUFloatType{2,1} ]</code></pre>
-</div>
-</div>
-<p><strong>Question 5</strong>: Matrix multiplication</p>
-<p>Generate a random matrix <span class="math inline">\(A\)</span> of shape <code>(10, 5)</code> and a random matrix <span class="math inline">\(B\)</span> of shape <code>(10, 5)</code> by sampling from a standard normal distribution.</p>
-<details>
-<summary>
-Hint
-</summary>
-Use <code>torch_randn(nrow, ncol)</code> to generate random matrices.
-</details>
-<p>Can you multiply these two matrices with each other and if so, in which order? If not, generate two random matrices with compatible shapes and multiply them.</p>
-<p><strong>Question 6</strong>: Uniform sampling</p>
-<p>Generate 10 random variables from a uniform distribution (using only torch functions) in the interval <span class="math inline">\([10, 20]\)</span>. Use <code>torch_rand()</code> for this (which does not allow for <code>min</code> and <code>max</code> parameters).</p>
-<details>
-<summary>
-Hint
-</summary>
-Add the lower bound and multiply with the width of the interval.
-</details>
-<p><strong>Question 7</strong>: Don’t touch this</p>
-<p>Consider the code below:</p>
-<div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  x[<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fu">torch_tensor</span>(<span class="sc">-</span><span class="dv">99</span>)</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(x)</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">torch_tensor</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>)</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">f</span>(x)</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>torch_tensor
--99
-  2
-  3
-[ CPULongType{3} ]</code></pre>
-</div>
-</div>
-<p>Implement a new different version of this function that returns the same tensor but does not change the value of the input tensor in-place.</p>
-<details>
-<summary>
-Hint
-</summary>
-The <code>$clone()</code> method might be helpful.
-</details>
+<p>In order to be able to successfully run the notebooks and solve the exercises, make sure that you have the right environment set up.</p>
+<section id="r-version" class="level2">
+<h2 class="anchored" data-anchor-id="r-version">R Version</h2>
+<p>These notebooks were developed using R 4.4.2, so ideally you should use the same version. You can check your current R version by running <code>R --version</code> in your terminal. If you have the same R version, you can skip the rest of this section.</p>
+<p>A convenient way to simultaneously maintain different versions of R and to easily switch between them is to use <code>rig</code>, the R installation manager. It’s <a href="https://github.com/r-lib/rig?tab=readme-ov-file#id-installation">documentation</a> contains instructions on how to install it on Windows, macOS, and Linux.</p>
+<p>After having installed <code>rig</code>, you can install R 4.4.2 and make it the default by running the following command in your terminal:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">rig</span> add 4.4.2</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">rig</span> default 4.4.2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Verify that the R version is 4.4.2 by running <code>R --version</code> in your terminal.</p>
+</section>
+<section id="libraries" class="level2">
+<h2 class="anchored" data-anchor-id="libraries">Libraries</h2>
+<p>For managing libraries, we use the <a href="https://rstudio.github.io/renv/articles/renv.html"><code>renv</code> package</a>. If you don’t have <code>renv</code> installed, you can install it by running the following command:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"renv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Next, initialize the <code>renv</code> environment by running the following command:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>renv<span class="sc">::</span><span class="fu">init</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Finally, restore the renv environment by running the following command. This might take some time as it downloads all the required libraries.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>renv<span class="sc">::</span><span class="fu">restore</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>To be able to use the <code>torch</code> package, you need to also run this additional command:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>torch<span class="sc">::</span><span class="fu">install_torch</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>If this completes successfully, you are ready to go! :rocket:</p>
+<p>To optionally check whether you have GPU support installed (this is not necessary for the exercises), run the following command:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>torch<span class="sc">::</span><span class="fu">cuda_is_available</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

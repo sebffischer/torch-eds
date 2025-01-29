@@ -20,40 +20,6 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
@@ -122,8 +88,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./index.html"> 
-<span class="menu-text">Home</span></a>
+    <a class="nav-link" href="./notebooks/setup-guide.html"> 
+<span class="menu-text">Setup</span></a>
   </li>  
   <li class="nav-item dropdown ">
     <a class="nav-link dropdown-toggle" href="#" id="nav-menu-tutorials" role="link" data-bs-toggle="dropdown" aria-expanded="false">
@@ -131,7 +97,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-tutorials">    
         <li>
-    <a class="dropdown-item" href="./notebooks/0-tutorial-guide.html">
+    <a class="dropdown-item" href="./notebooks/0-tutorial-intro.html">
  <span class="dropdown-text">Intro</span></a>
   </li>  
         <li><hr class="dropdown-divider"></li>
@@ -171,7 +137,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-exercises">    
         <li>
-    <a class="dropdown-item" href="./notebooks/0-exercise-guide.html">
+    <a class="dropdown-item" href="./notebooks/0-exercise-intro.html">
  <span class="dropdown-text">Intro</span></a>
   </li>  
         <li><hr class="dropdown-divider"></li>
@@ -272,33 +238,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Training Efficiency</li>
 <li>Use Case</li>
 </ol>
-</section>
-<section id="setup-card_index_dividers" class="level2">
-<h2 class="anchored" data-anchor-id="setup-card_index_dividers">Setup :card_index_dividers:</h2>
-<p>In order to be able to successfully run the notebooks and solve the exercises, make sure that you have the right environment set up.</p>
-<section id="r-version" class="level3">
-<h3 class="anchored" data-anchor-id="r-version">R Version</h3>
-<p>These notebooks were developed using R 4.4.2, so ideally you should use the same version. You can check your current R version by running <code>R --version</code> in your terminal. If you have the same R version, you can skip the rest of this section.</p>
-<p>A convenient way to simultaneously maintain different versions of R and to easily switch between them is to use <code>rig</code>, the R installation manager. It’s <a href="https://github.com/r-lib/rig?tab=readme-ov-file#id-installation">documentation</a> contains instructions on how to install it on Windows, macOS, and Linux.</p>
-<p>After having installed <code>rig</code>, you can install R 4.4.2 and make it the default by running the following command in your terminal:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">rig</span> add 4.4.2</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">rig</span> default 4.4.2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Verify that the R version is 4.4.2 by running <code>R --version</code> in your terminal.</p>
-</section>
-<section id="libraries" class="level3">
-<h3 class="anchored" data-anchor-id="libraries">Libraries</h3>
-<p>For managing libraries, we use the <a href="https://rstudio.github.io/renv/articles/renv.html"><code>renv</code> package</a>. If you don’t have <code>renv</code> installed, you can install it by running the following command:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"renv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Next, initialize the <code>renv</code> environment by running the following command:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>renv<span class="sc">::</span><span class="fu">init</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Finally, restore the renv environment by running the following command. This might take some time as it downloads all the required libraries.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>renv<span class="sc">::</span><span class="fu">restore</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>To be able to use the <code>torch</code> package, you need to also run this additional command:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>torch<span class="sc">::</span><span class="fu">install_torch</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>If this completes successfully, you are ready to go! :rocket:</p>
-<p>To optionally check whether you have GPU support installed (this is not necessary for the exercises), run the following command:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>torch<span class="sc">::</span><span class="fu">cuda_is_available</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
 </section>
 <section id="credit" class="level2">
 <h2 class="anchored" data-anchor-id="credit">Credit</h2>
