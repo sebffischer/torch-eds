@@ -553,7 +553,7 @@ Below we plot the training and validation for the different epochs:
 
 ```{r, echo = FALSE}
 library(ggplot2)
-ggplot(history_df, aes(x = epoch)) +
+ggplot(history, aes(x = epoch)) +
   geom_line(aes(y = train.classif.logloss, color = "Training Loss")) +
   geom_line(aes(y = valid.classif.logloss, color = "Validation Loss")) +
   labs(title = "MLP Training and Validation Loss Over Epochs",

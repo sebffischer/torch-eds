@@ -47,8 +47,6 @@ website:
             href: "../notebooks/5-mlr3torch-exercise-task.html"
           - text: "6. Training Efficiency"
             href: "../notebooks/6-training-efficiency-exercise-task.html"
-          - text: "7. Use Case"
-            href: "../notebooks/7-usecase-exercise-task.html"
       - text: "Solutions"
         menu:
           - text: "1. Tensors"
@@ -59,3 +57,7 @@ website:
             href: "../notebooks/3-modules-data-exercise-solution.html"
           - text: "4. Optimizers"
             href: "../notebooks/4-optimizer-exercise-solution.html"
+          - text: "5. mlr3torch"
+            href: "../notebooks/5-mlr3torch-exercise-solution.html"
+          - text: "6. Training Efficiency"
+            href: "../notebooks/6-training-efficiency-exercise-solution.html"
