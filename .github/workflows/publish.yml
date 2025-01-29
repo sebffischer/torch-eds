@@ -17,20 +17,6 @@ jobs:
 
       - uses: quarto-dev/quarto-actions/setup@v2
 
-      - uses: r-lib/actions/setup-r-dependencies@v2
-
-      - name: Install renv
-        run: Rscript -e "install.packages('renv')"
-
-      - name: Restore renv
-        run: Rscript -e "renv::restore()"
-
-      - name: Install torch
-        run: Rscript -e "torch::install_torch()"
-
-      - name: Render site
-        run: quarto render mlr-org/
-
       - name: Deploy
         if: ${{ github.event_name == 'push' }}
         uses: JamesIves/github-pages-deploy-action@v4
@@ -38,5 +24,5 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: 'deploy website'
           branch: gh-pages
-          folder: _site
+          folder: docs
           single-commit: true
