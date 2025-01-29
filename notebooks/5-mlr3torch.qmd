@@ -126,8 +126,8 @@ Hyperparameter tuning is an essential process in machine learning to optimize th
    ```{r}
    library(mlr3tuning)
    lrn_tree$configure(
-     cp = p_dbl(lower = 0.001, upper = 0.1),
-     maxdepth = p_int(lower = 1, upper = 30)
+     cp = to_tune(lower = 0.001, upper = 0.1),
+     maxdepth = to_tune(lower = 1, upper = 30)
    )
    ```
 
@@ -157,7 +157,6 @@ Hyperparameter tuning is an essential process in machine learning to optimize th
      learner = lrn_tree,
      resampling = rsmp_tune,
      measure = msr_tune,
-     search_space = search_space,
      tuner = tuner,
      term_evals = 10L
    )

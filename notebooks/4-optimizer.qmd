@@ -493,9 +493,15 @@ task = tsk("spam")
 l1$train(task)
 l2$train(task)
 
-ggplot(d, aes(x = epoch, y = trainlogloss, color = lr)) +
-  geom_line(aes(y = train.classif.logloss, color = "training logloss")) +
-  geom_line(aes(y = valid.classif.logloss, color = "validation logloss")) +
+d = data.frame(
+  epoch = rep(1:epochs, times = 2),
+  logloss = c(l1$model$callbacks$history$train.classif.logloss, l2$model$callbacks$history$train.classif.logloss),
+  lr = rep(c("0.01", "0.001"), each = epochs)
+)
+
+
+ggplot(d, aes(x = epoch, y = logloss, color = lr)) +
+  geom_line() +
   theme_minimal()
 ```
 
