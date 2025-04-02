@@ -1,5 +1,7 @@
 # Deep Learning with `(mlr3)torch` in R :fire:
 
+> ⚠️ **This course has been superseded by [mlr3torch-course](https://github.com/mlr-org/mlr3torch-course). Please refer to that repository for the most up-to-date material.**
+
 ## Overview :book:
 
 This is a course, containing seven tutorials and corresponding exercises with solutions on [`torch`](https://torch.mlverse.org/) and [`mlr3torch`](https://mlr3torch.mlr-org.com/).
